@@ -22,17 +22,17 @@ public class PresupuestoProducto {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id_presupuesto", nullable = false)
-    private Presupuesto idPresupuesto;
+    private Presupuestos idPresupuesto;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_producto", nullable = false)
-    private Producto idProducto;
+    private Productos idProducto;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_cliente_beneficiario", nullable = false)
-    private Clientes.Clientes idClienteBeneficiario;
+    private Clientes idClienteBeneficiario;
 
     @ColumnDefault("1")
     @Column(name = "cantidad")

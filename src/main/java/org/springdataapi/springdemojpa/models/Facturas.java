@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @Setter
 @Entity
 @Table(name = "facturas")
-public class Factura {
+public class Facturas {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_factura", nullable = false)
@@ -29,12 +29,12 @@ public class Factura {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_cliente_pagador", nullable = false)
-    private Clientes.Clientes idClientePagador;
+    private Clientes idClientePagador;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     @JoinColumn(name = "id_empleado")
-    private Empleado idEmpleado;
+    private Empleados idEmpleado;
 
     @NotNull
     @Column(name = "fecha_emision", nullable = false)

@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Setter
 @Entity
 @Table(name = "presupuestos")
-public class Presupuesto {
+public class Presupuestos {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_presupuesto", nullable = false)
@@ -21,17 +21,17 @@ public class Presupuesto {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_empleado", nullable = false)
-    private Empleado idEmpleado;
+    private Empleados idEmpleado;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_cliente_pagador", nullable = false)
-    private Clientes.Clientes idClientePagador;
+    private Clientes idClientePagador;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_cliente_beneficiario", nullable = false)
-    private Clientes.Clientes idClienteBeneficiario;
+    private Clientes idClienteBeneficiario;
 
     @NotNull
     @Column(name = "presupuesto", nullable = false)

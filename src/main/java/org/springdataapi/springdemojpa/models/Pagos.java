@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @Setter
 @Entity
 @Table(name = "pagos")
-public class Pago {
+public class Pagos {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_pago", nullable = false)
@@ -25,7 +25,7 @@ public class Pago {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "id_factura", nullable = false)
-    private Factura idFactura;
+    private Facturas idFactura;
 
     @Column(name = "fecha_pago")
     private LocalDate fechaPago;
