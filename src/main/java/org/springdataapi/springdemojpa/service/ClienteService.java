@@ -61,7 +61,6 @@ public class ClienteService {
         cliente.setTipoCliente(dto.getTipo_cliente());
         cliente.setFechaAlta(LocalDate.now());
 
-        // Empleado responsable
         if (dto.getId_empleadoresponsable() != null) {
             Empleados empleado = empleadosRepository.findById(dto.getId_empleadoresponsable())
                     .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
@@ -96,12 +95,12 @@ public class ClienteService {
         cliente.setTelefono(dto.getTelefono());
         cliente.setTipoCliente(dto.getTipo_cliente());
 
-        // ✅ Solo actualizar password si no está vacío
+
         if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
             cliente.setPassword(dto.getPassword());
         }
 
-        // Empleado responsable
+
         if (dto.getId_empleadoresponsable() != null) {
             Empleados empleado = empleadosRepository.findById(dto.getId_empleadoresponsable())
                     .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
@@ -116,14 +115,36 @@ public class ClienteService {
 
 
     private void validarCampos(ClienteDTO dto) {
-        if (dto.getNombre() == null || dto.getNombre().isBlank()) {
+        if (dto.getNombre() == null || dto.getNombre().trim().isEmpty()) {
             throw new RuntimeException("Nombre obligatorio");
         }
-        if (dto.getEmail() == null || dto.getEmail().isBlank()) {
-            throw new RuntimeException("Email obligatorio");
+
+        if (dto.getPassword() == null || dto.getPassword().trim().isEmpty()) {
+            dto.setPassword("PonleContraseñaSubnormal");
         }
-        if (dto.getTelefono() == null || dto.getTelefono().isBlank()) {
-            throw new RuntimeException("Teléfono obligatorio");
+        if (dto.getEmail() != null && !dto.getEmail().trim().isEmpty())
+        {
+            if (!dto.getEmail().contains("@"))
+            {
+                throw new RuntimeException("Email obligatorio");
+            }
+        }
+        if (dto.getTelefono() != null && dto.getTelefono().length() > 20) {
+            throw new IllegalArgumentException("El teléfono supera la longitud máxima permitida.");
+        }
+
+        if (dto.getTipo_cliente() != null && !dto.getTipo_cliente().trim().isEmpty()) {
+            String tipo = dto.getTipo_cliente().trim().toUpperCase();
+            if (tipo.equals("PERSONA") || tipo.equals("PARTICULAR")) {
+                dto.setTipo_cliente("PARTICULAR");
+            } else if (tipo.equals("EMPRESA")) {
+                dto.setTipo_cliente("EMPRESA");
+            } else if (!tipo.equals("PARTICULAR") && !tipo.equals("EMPRESA")) {
+                throw new IllegalArgumentException("Tipo de cliente inválido: " + dto.getTipo_cliente() +
+                        ". Valores válidos: PARTICULAR, EMPRESA");
+            } else {
+                dto.setTipo_cliente(tipo);
+            }
         }
     }
 }
