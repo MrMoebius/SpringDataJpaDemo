@@ -5,19 +5,20 @@ import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface EmpleadosRepository extends ListCrudRepository<Empleados, Integer> {
 
-    Optional<Empleados> findFirstByNombreIgnoreCase(String nombre);
+    Empleados findByNombre(String nombre);
 
     Optional<Empleados> findByEmail(String email);
-
     Optional<Empleados> findByTelefono(String telefono);
 
-    Optional<Empleados> findFirstByFechaIngreso(LocalDate fechaIngreso);
+    boolean existsByEmail(String email);
+    boolean existsByTelefono(String telefono);
 
-    Optional<Empleados> findFirstByEstadoIgnoreCase(String estado);
+    List<Empleados> findByEstado(String estado);
+    List<Empleados> findByFechaIngreso(LocalDate fechaIngreso);
 }
-
