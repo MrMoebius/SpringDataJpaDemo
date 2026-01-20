@@ -45,9 +45,85 @@ public class Clientes {
     @Column(name = "fecha_alta")
     private LocalDate fechaAlta;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_empleado_responsable")
     private Empleados idEmpleadoResponsable;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    public String getTipoCliente() {
+        return tipoCliente;
+    }
+
+    public void setTipoCliente(String tipoCliente) {
+        this.tipoCliente = tipoCliente;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public LocalDate getFechaAlta() {
+        return fechaAlta;
+    }
+
+    public void setFechaAlta(LocalDate fechaAlta) {
+        this.fechaAlta = fechaAlta;
+    }
+
+    public Empleados getIdEmpleadoResponsable() {
+        return idEmpleadoResponsable;
+    }
+
+    public void setIdEmpleadoResponsable(Empleados idEmpleadoResponsable) {
+        this.idEmpleadoResponsable = idEmpleadoResponsable;
+    }
+
+    @Override
+    public String toString() {
+        return "Clientes{" +
+                "id=" + id +
+                ", nombre='" + nombre + '\'' +
+                ", email='" + email + '\'' +
+                ", telefono='" + telefono + '\'' +
+                ", tipoCliente='" + tipoCliente + '\'' +
+                ", password='" + password + '\'' +
+                ", fechaAlta=" + fechaAlta +
+                '}';
+    }
 
 }
