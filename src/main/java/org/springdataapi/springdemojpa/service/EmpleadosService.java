@@ -40,8 +40,9 @@ public class EmpleadosService {
     }
 
     public Optional<Empleados> findByTelefono(String telefono) {
-        if (telefono == null || telefono.isBlank()) throw new RuntimeException("Teléfono obligatorio");
-        return Optional.ofNullable(empleadosRepository.findByTelefono(telefono.trim())
+        String tel = normalizarYValidarTelefono(telefono); // ✅ solo números
+        if (tel == null) throw new RuntimeException("Teléfono obligatorio");
+        return Optional.ofNullable(empleadosRepository.findByTelefono(tel)
                 .orElseThrow(() -> new RuntimeException("Empleado no encontrado por teléfono")));
     }
 
@@ -61,8 +62,11 @@ public class EmpleadosService {
         if (empleadosRepository.existsByEmail(dto.getEmail().trim())) {
             throw new RuntimeException("Email ya registrado");
         }
-        if (dto.getTelefono() != null && !dto.getTelefono().isBlank()
-                && empleadosRepository.existsByTelefono(dto.getTelefono().trim())) {
+
+        // ✅ normaliza (quita espacios) y valida solo dígitos
+        String telefonoNormalizado = normalizarYValidarTelefono(dto.getTelefono());
+
+        if (telefonoNormalizado != null && empleadosRepository.existsByTelefono(telefonoNormalizado)) {
             throw new RuntimeException("Teléfono ya registrado");
         }
 
@@ -72,7 +76,7 @@ public class EmpleadosService {
         Empleados e = new Empleados();
         e.setNombre(dto.getNombre().trim());
         e.setEmail(dto.getEmail().trim());
-        e.setTelefono((dto.getTelefono() == null || dto.getTelefono().isBlank()) ? null : dto.getTelefono().trim());
+        e.setTelefono(telefonoNormalizado);
         e.setPassword(dto.getPassword()); // aquí no has pedido hash
         e.setIdRol(rol);
 
@@ -102,7 +106,9 @@ public class EmpleadosService {
             throw new RuntimeException("Email ya registrado");
         }
 
-        String nuevoTelefono = (dto.getTelefono() == null || dto.getTelefono().isBlank()) ? null : dto.getTelefono().trim();
+        // ✅ normaliza (quita espacios) y valida solo dígitos
+        String nuevoTelefono = normalizarYValidarTelefono(dto.getTelefono());
+
         if (nuevoTelefono != null && (e.getTelefono() == null || !nuevoTelefono.equals(e.getTelefono()))
                 && empleadosRepository.existsByTelefono(nuevoTelefono)) {
             throw new RuntimeException("Teléfono ya registrado");
@@ -161,5 +167,23 @@ public class EmpleadosService {
             throw new RuntimeException("Email obligatorio");
         }
         // password / rol / fechaIngreso / estado: opcionales en update
+    }
+
+    /**
+     * Devuelve null si viene vacío. Si viene informado, exige SOLO dígitos.
+     * Además elimina espacios internos ("600 123 123" -> "600123123").
+     */
+    private String normalizarYValidarTelefono(String telefono) {
+        if (telefono == null) return null;
+
+        String t = telefono.trim();
+        if (t.isBlank()) return null;
+
+        t = t.replaceAll("\\s+", ""); // quita espacios
+
+        if (!t.matches("\\d+")) {
+            throw new RuntimeException("El teléfono solo puede contener números (0-9)");
+        }
+        return t;
     }
 }
