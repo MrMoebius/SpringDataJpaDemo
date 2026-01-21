@@ -57,9 +57,13 @@
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Estado</label>
-            <input type="text" th:field="*{estado}" class="form-control" placeholder="activo"/>
+            <label class="form-label">Activo</label>
+            <select th:field="*{estado}" class="form-select">
+                <option th:value="'activo'">Sí</option>
+                <option th:value="'inactivo'">No</option>
+            </select>
         </div>
+
 
         <div class="mb-3">
             <label class="form-label" th:text="*{id} == null ? 'Password *' : 'Password'"></label>

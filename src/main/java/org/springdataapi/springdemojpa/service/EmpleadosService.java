@@ -81,7 +81,9 @@ public class EmpleadosService {
         e.setIdRol(rol);
 
         e.setFechaIngreso(dto.getFechaIngreso() != null ? dto.getFechaIngreso() : LocalDate.now());
-        e.setEstado((dto.getEstado() == null || dto.getEstado().isBlank()) ? "activo" : dto.getEstado().trim());
+
+        // ✅ aquí: soporta "Sí/No", "true/false", "activo/inactivo"
+        e.setEstado(normalizarEstado(dto.getEstado()));
 
         empleadosRepository.save(e);
     }
@@ -121,8 +123,10 @@ public class EmpleadosService {
         if (dto.getFechaIngreso() != null) {
             e.setFechaIngreso(dto.getFechaIngreso());
         }
-        if (dto.getEstado() != null && !dto.getEstado().isBlank()) {
-            e.setEstado(dto.getEstado().trim());
+
+        // ✅ aquí: si viene, normaliza (Sí/No/true/false/activo/inactivo)
+        if (dto.getEstado() != null) {
+            e.setEstado(normalizarEstado(dto.getEstado()));
         }
 
         // ✅ solo si viene
@@ -167,6 +171,24 @@ public class EmpleadosService {
             throw new RuntimeException("Email obligatorio");
         }
         // password / rol / fechaIngreso / estado: opcionales en update
+    }
+
+    /**
+     * ✅ Normaliza el estado para soportar un <select> "Sí/No"
+     * - null o vacío => "activo"
+     * - "si"/"sí"/"true"/"1"/"activo" => "activo"
+     * - "no"/"false"/"0"/"inactivo" => "inactivo"
+     */
+    private String normalizarEstado(String estado) {
+        if (estado == null || estado.isBlank()) return "activo";
+
+        String s = estado.trim().toLowerCase();
+
+        return switch (s) {
+            case "activo", "si", "sí", "true", "1" -> "activo";
+            case "inactivo", "no", "false", "0" -> "inactivo";
+            default -> throw new RuntimeException("Estado inválido (use Sí/No o activo/inactivo)");
+        };
     }
 
     /**

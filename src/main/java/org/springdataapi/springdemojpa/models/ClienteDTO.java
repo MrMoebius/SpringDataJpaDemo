@@ -4,7 +4,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDate;
 
-public class ClienteDTO {
+public class
+ClienteDTO {
 
     private Integer id;
 

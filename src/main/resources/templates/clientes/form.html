@@ -40,8 +40,11 @@
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Tipo de Cliente</label>
-            <input type="text" th:field="*{tipo_cliente}" class="form-control"/>
+            <label class="form-label">Tipo de cliente</label>
+            <select th:field="*{tipo_cliente}" class="form-select">
+                <option th:value="'EMPRESA'">EMPRESA</option>
+                <option th:value="'PARTICULAR'">PARTICULAR</option>
+            </select>
         </div>
 
         <div class="mb-3">
