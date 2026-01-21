@@ -177,7 +177,7 @@ public class EmpleadosService {
         if (telefono == null) return null;
 
         String t = telefono.trim();
-        if (t.isBlank()) return null;
+        if (t.isBlank() && t.length() < 10) return null;
 
         t = t.replaceAll("\\s+", ""); // quita espacios
 
