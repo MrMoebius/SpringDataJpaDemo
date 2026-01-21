@@ -1,7 +1,7 @@
 package org.springdataapi.springdemojpa.controller;
 
 import jakarta.validation.Valid;
-import org.springdataapi.springdemojpa.models.ClienteDTO;
+import org.springdataapi.springdemojpa.models.ClientesDTO;
 import org.springdataapi.springdemojpa.models.Clientes;
 import org.springdataapi.springdemojpa.service.ClienteService;
 import org.springdataapi.springdemojpa.service.EmpleadosService;
@@ -17,7 +17,8 @@ public class ClienteController {
     private final ClienteService clienteService;
     private final EmpleadosService empleadosService;
 
-    public ClienteController(ClienteService clienteService, EmpleadosService empleadosService) {
+    public ClienteController(ClienteService clienteService,
+                             EmpleadosService empleadosService) {
         this.clienteService = clienteService;
         this.empleadosService = empleadosService;
     }
@@ -30,7 +31,7 @@ public class ClienteController {
 
     @GetMapping("/nuevo")
     public String nuevoCliente(Model model) {
-        model.addAttribute("clienteDTO", new ClienteDTO());
+        model.addAttribute("clienteDTO", new ClientesDTO());
         model.addAttribute("empleados", empleadosService.findAll());
         return "clientes/form";
     }
@@ -39,7 +40,7 @@ public class ClienteController {
     public String editarCliente(@PathVariable Integer id, Model model) {
         Clientes cliente = clienteService.findById(id);
 
-        ClienteDTO dto = new ClienteDTO();
+        ClientesDTO dto = new ClientesDTO();
         dto.setId(cliente.getId());
         dto.setNombre(cliente.getNombre());
         dto.setEmail(cliente.getEmail());
@@ -58,10 +59,9 @@ public class ClienteController {
 
     @PostMapping("/guardar")
     public String guardarCliente(
-            @Valid @ModelAttribute("clienteDTO") ClienteDTO dto,
+            @Valid @ModelAttribute("clienteDTO") ClientesDTO dto,
             BindingResult result,
-            Model model
-    ) {
+            Model model) {
         if (result.hasErrors()) {
             model.addAttribute("empleados", empleadosService.findAll());
             return "clientes/form";

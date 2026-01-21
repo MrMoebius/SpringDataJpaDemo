@@ -12,6 +12,7 @@ import org.hibernate.annotations.ColumnDefault;
 @Entity
 @Table(name = "productos")
 public class Productos {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_producto", nullable = false)

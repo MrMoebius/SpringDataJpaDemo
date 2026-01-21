@@ -1,11 +1,10 @@
 package org.springdataapi.springdemojpa.service;
 
-import org.springdataapi.springdemojpa.models.ClienteDTO;
+import org.springdataapi.springdemojpa.models.ClientesDTO;
 import org.springdataapi.springdemojpa.models.Clientes;
 import org.springdataapi.springdemojpa.models.Empleados;
 import org.springdataapi.springdemojpa.repository.ClientesRepository;
 import org.springdataapi.springdemojpa.repository.EmpleadosRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,7 +17,8 @@ public class ClienteService {
     private final ClientesRepository clientesRepository;
     private final EmpleadosRepository empleadosRepository;
 
-    public ClienteService(ClientesRepository clientesRepository, EmpleadosRepository empleadosRepository) {
+    public ClienteService(ClientesRepository clientesRepository,
+                          EmpleadosRepository empleadosRepository) {
         this.clientesRepository = clientesRepository;
         this.empleadosRepository = empleadosRepository;
     }
@@ -42,7 +42,7 @@ public class ClienteService {
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado por teléfono")));
     }
 
-    public void crear(ClienteDTO dto) {
+    public void crear(ClientesDTO dto) {
 
         validarCampos(dto);
 
@@ -78,7 +78,7 @@ public class ClienteService {
         clientesRepository.deleteById(id);
     }
 
-    public Clientes actualizar(Integer id, ClienteDTO dto) {
+    public Clientes actualizar(Integer id, ClientesDTO dto) {
         Clientes cliente = clientesRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
@@ -114,7 +114,7 @@ public class ClienteService {
 
 
 
-    private void validarCampos(ClienteDTO dto) {
+    private void validarCampos(ClientesDTO dto) {
         if (dto.getNombre() == null || dto.getNombre().trim().isEmpty()) {
             throw new RuntimeException("Nombre obligatorio");
         }

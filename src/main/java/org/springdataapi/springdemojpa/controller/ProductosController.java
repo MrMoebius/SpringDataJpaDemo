@@ -50,14 +50,18 @@ public class ProductosController {
     }
 
     @PostMapping("/guardar")
-    public String guardar(@Valid @ModelAttribute("productosDTO") ProductosDTO dto,
-                          BindingResult br,
-                          Model model) {
-        if (br.hasErrors()) return "productos/form";
+    public String guardar(
+            @Valid @ModelAttribute("productosDTO") ProductosDTO dto,
+            BindingResult br,
+            Model model) {
+        if (br.hasErrors())
+            return "productos/form";
 
         try {
-            if (dto.getId() == null) productosService.crear(dto);
-            else productosService.actualizar(dto.getId(), dto);
+            if (dto.getId() == null)
+                productosService.crear(dto);
+            else
+                productosService.actualizar(dto.getId(), dto);
             return "redirect:/productos";
         } catch (RuntimeException ex) {
             model.addAttribute("error", ex.getMessage());

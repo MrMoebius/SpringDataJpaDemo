@@ -61,8 +61,7 @@ public class EmpleadosController {
     public String guardar(
             @Valid @ModelAttribute("empleadosDTO") EmpleadosDTO dto,
             BindingResult result,
-            Model model
-    ) {
+            Model model) {
         if (result.hasErrors()) {
             model.addAttribute("roles", rolesEmpleadoService.findAll());
             return "empleados/form";
