@@ -39,7 +39,7 @@ public interface ClientesRepository extends JpaRepository<Clientes, Integer>
           AND (:tipoCliente IS NULL OR :tipoCliente = '' OR c.tipoCliente = :tipoCliente)
           AND (:idEmpleado IS NULL OR c.idEmpleadoResponsable.id = :idEmpleado)
           AND (:fechaDesde IS NULL OR c.fechaAlta >= :fechaDesde)
-        ORDER BY c.fechaAlta DESC
+        ORDER BY c.id
     """)
     public List<Clientes> buscarClientesFiltrados(
             @Param("telefono") String telefono,

@@ -29,4 +29,21 @@ public interface ProductosRepository extends JpaRepository<Productos, Integer>
     List<Productos> buscarProductosFiltrados(@Param("categoria") String categoria,
                                     @Param("precioMin") Double precioMin);
 
+    @Query("""
+        SELECT p
+        FROM Productos p
+        WHERE (:nombre IS NULL OR :nombre = '' OR p.nombre LIKE CONCAT('%', :nombre, '%'))
+          AND (:categoria IS NULL OR :categoria = '' OR p.categoria = :categoria)
+          AND (:precioMin IS NULL OR p.precio >= :precioMin)
+          AND (:precioMax IS NULL OR p.precio <= :precioMax)
+          AND (:activo IS NULL OR p.activo = :activo)
+        ORDER BY p.id
+    """)
+    List<Productos> buscarProductosFiltradosCompleto(
+            @Param("nombre") String nombre,
+            @Param("categoria") String categoria,
+            @Param("precioMin") Double precioMin,
+            @Param("precioMax") Double precioMax,
+            @Param("activo") Boolean activo);
+
 }

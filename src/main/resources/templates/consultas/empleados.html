@@ -1,38 +1,86 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Empleados</title>
+    <title>Consulta de Empleados</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
 
-<div class="navbar">
-    <div class="nav-title">Gestión de Empleados</div>
-    <div>
-        <a href="/">Inicio</a>
-    </div>
-</div>
-
 <div class="container">
 
-    <h1>Lista de Empleados</h1>
+    <!-- Título -->
+    <h2>Consulta de Empleados</h2>
 
+    <!-- FORMULARIO DE BÚSQUEDA -->
     <form th:action="@{/consultas/empleados}" method="get">
-        <label for="letra" class="form-label">Filtrar por letra inicial:</label>
-        <input type="text" id="letra" name="letra" maxlength="1" placeholder="Ingrese una letra" class="form-control"
-               th:value="${letra}">
-        <button type="submit" class="btn btn-primary btn-sm m-top">Filtrar</button>
+
+        <div class="form-group m-bottom">
+            <label class="form-label">Teléfono</label>
+            <input type="text" name="telefono" class="form-control" 
+                   placeholder="Buscar por teléfono" th:value="${telefono}">
+        </div>
+
+        <div class="form-group m-bottom">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" 
+                   placeholder="Buscar por email" th:value="${email}">
+        </div>
+
+        <div class="form-group m-bottom">
+            <label class="form-label">Estado</label>
+            <select name="estado" class="form-select">
+                <option value="">-- Todos --</option>
+                <option value="activo" th:selected="${estado == 'activo'}">Activo</option>
+                <option value="inactivo" th:selected="${estado == 'inactivo'}">Inactivo</option>
+            </select>
+        </div>
+
+        <div class="form-group m-bottom">
+            <label class="form-label">Rol</label>
+            <select name="idRol" class="form-select">
+                <option value="">-- Todos --</option>
+                <option th:each="rol : ${roles}"
+                        th:value="${rol.id}"
+                        th:text="${rol.nombreRol}"
+                        th:selected="${rol.id == idRol}">
+                </option>
+            </select>
+        </div>
+
+        <div class="form-group m-bottom">
+            <label class="form-label">Tiene Clientes Asociados</label>
+            <select name="tieneClientes" class="form-select">
+                <option value="">-- Todos --</option>
+                <option value="true" th:selected="${tieneClientes == 'true'}">Sí</option>
+                <option value="false" th:selected="${tieneClientes == 'false'}">No</option>
+            </select>
+        </div>
+
+        <div class="form-group m-bottom">
+            <label class="form-label">Fecha de ingreso desde</label>
+            <input type="date" name="fechaIngreso" class="form-control" th:value="${fechaIngreso}">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Buscar</button>
+        <a th:href="@{/consultas/empleados}" class="btn btn-secondary">Limpiar</a>
     </form>
 
-    <div class="m-top">
+    <!-- RESULTADOS -->
+    <div th:if="${empleados != null}" class="m-top">
+
+        <h3>Resultados</h3>
+
         <table>
             <thead>
             <tr>
                 <th>ID</th>
                 <th>Nombre</th>
                 <th>Email</th>
+                <th>Teléfono</th>
+                <th>Estado</th>
+                <th>Rol</th>
+                <th>Fecha Ingreso</th>
             </tr>
             </thead>
             <tbody>
@@ -40,24 +88,24 @@
                 <td th:text="${empleado.id}"></td>
                 <td th:text="${empleado.nombre}"></td>
                 <td th:text="${empleado.email}"></td>
-            </tr>
-            <tr th:if="${#lists.isEmpty(empleados)}">
-                <td colspan="4" class="text-center">No se encontraron empleados</td>
+                <td th:text="${empleado.telefono != null ? empleado.telefono : 'N/A'}"></td>
+                <td th:text="${empleado.estado}"></td>
+                <td th:text="${empleado.idRol != null ? empleado.idRol.nombreRol : 'N/A'}"></td>
+                <td th:text="${empleado.fechaIngreso != null ? #temporals.format(empleado.fechaIngreso, 'dd/MM/yyyy') : 'N/A'}"></td>
             </tr>
             </tbody>
         </table>
+
+        <p th:if="${#lists.isEmpty(empleados)}" class="m-top text-center">
+            No se encontraron empleados
+        </p>
     </div>
 
-</div>
+    <!-- VOLVER -->
+    <div class="m-top text-center">
+        <a th:href="@{/}" class="btn btn-secondary">Volver al menú</a>
+    </div>
 
-</div>
-
-<footer class="footer">
-    <span class="footer-title">Sistema CRM</span>
-    <form th:action="@{/logout}" method="post" class="footer-logout">
-        <button type="submit" class="logout-link">Cerrar Sesión</button>
-    </form>
-</footer>
 </div>
 
 </body>

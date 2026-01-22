@@ -109,6 +109,12 @@ public class ProductosService {
         return productosRepository.buscarProductosFiltrados(categoria,precioMin);
     }
 
+    public List<Productos> buscarProductosFiltrados(
+            String nombre, String categoria, Double precioMin, Double precioMax, Boolean activo) {
+        return productosRepository.buscarProductosFiltradosCompleto(
+                nombre, categoria, precioMin, precioMax, activo);
+    }
+
     private void validarCamposCrear(ProductosDTO dto) {
         if (dto == null) throw new RuntimeException("DTO obligatorio");
         if (dto.getNombre() == null || dto.getNombre().isBlank()) {

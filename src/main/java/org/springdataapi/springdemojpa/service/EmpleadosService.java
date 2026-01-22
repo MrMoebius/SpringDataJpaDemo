@@ -145,6 +145,13 @@ public class EmpleadosService {
         return empleadosRepository.buscarPorLetra(letra);
     }
 
+    public List<Empleados> buscarEmpleadosFiltrados(
+            String telefono, String email, String estado, 
+            Integer idRol, Boolean tieneClientes, LocalDate fechaIngreso) {
+        return empleadosRepository.buscarEmpleadosFiltrados(
+                telefono, email, estado, idRol, tieneClientes, fechaIngreso);
+    }
+
     private void validarCamposCrear(EmpleadosDTO dto) {
         if (dto == null) throw new RuntimeException("DTO obligatorio");
 
@@ -192,10 +199,6 @@ public class EmpleadosService {
         };
     }
 
-    /**
-     * Devuelve null si viene vacío. Si viene informado, exige SOLO dígitos.
-     * Además elimina espacios internos ("600 123 123" -> "600123123").
-     */
     private String normalizarYValidarTelefono(String telefono) {
         if (telefono == null) return null;
 
