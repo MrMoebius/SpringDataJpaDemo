@@ -51,8 +51,12 @@
             </div>
 
             <div class="m-bottom">
-                <label class="form-label">Password *</label>
-                <input type="password" th:field="*{password}" class="form-control"/>
+                <label class="form-label" th:text="${clienteDTO.id} == null ? 'Password *' : 'Password'"></label>
+                <input type="password" th:field="*{password}" class="form-control"
+                       th:placeholder="${clienteDTO.id} == null ? 'Obligatorio' : 'Dejar vacío para mantener la actual'"/>
+                <small class="form-text" th:if="${clienteDTO.id} != null" style="color: #b0b0b0;">
+                    Deja este campo vacío si no deseas cambiar la contraseña
+                </small>
             </div>
 
             <div class="m-bottom">

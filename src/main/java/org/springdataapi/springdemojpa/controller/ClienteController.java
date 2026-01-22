@@ -68,7 +68,11 @@ public class ClienteController {
     }
 
     @GetMapping("/{id}/editar")
-    public String editarCliente(@PathVariable Integer id, Model model) {
+    public String editarCliente(@PathVariable Integer id, Authentication authentication, Model model) {
+        if (authentication != null &&
+            authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CLIENTE"))) {
+            return "redirect:/clientes/mi-perfil";
+        }
         Clientes cliente = clienteService.findById(id);
 
         ClientesDTO dto = new ClientesDTO();
@@ -77,7 +81,8 @@ public class ClienteController {
         dto.setEmail(cliente.getEmail());
         dto.setTelefono(cliente.getTelefono());
         dto.setTipo_cliente(cliente.getTipoCliente());
-        dto.setPassword(cliente.getPassword());
+        // NO establecer password para no exponerla
+        dto.setPassword(null);
         dto.setFecha_alta(cliente.getFechaAlta());
         if (cliente.getIdEmpleadoResponsable() != null) {
             dto.setId_empleadoresponsable(cliente.getIdEmpleadoResponsable().getId());
