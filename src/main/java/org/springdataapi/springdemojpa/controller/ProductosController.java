@@ -23,8 +23,16 @@ public class ProductosController {
     }
 
     @GetMapping
-    public String listar(Model model) {
-        model.addAttribute("productos", productosService.findAll());
+    public String listar(Authentication authentication, Model model) {
+        // Si es CLIENTE, solo muestra productos activos y en modo solo lectura
+        if (authentication != null && 
+            authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CLIENTE"))) {
+            model.addAttribute("productos", productosService.findProductosActivos());
+            model.addAttribute("soloLectura", true);
+        } else {
+            model.addAttribute("productos", productosService.findAll());
+            model.addAttribute("soloLectura", false);
+        }
         return "productos/list";
     }
 
@@ -42,7 +50,13 @@ public class ProductosController {
     }
 
     @GetMapping("/editar/{id}")
-    public String editar(@PathVariable Integer id, Model model) {
+    public String editar(@PathVariable Integer id, Authentication authentication, Model model) {
+        // Solo ADMIN y EMPLEADO pueden editar productos
+        if (authentication == null || 
+            authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CLIENTE"))) {
+            return "redirect:/productos";
+        }
+        
         Productos p = productosService.findById(id);
 
         ProductosDTO dto = new ProductosDTO();
@@ -61,8 +75,15 @@ public class ProductosController {
     public String guardar(
             @Valid @ModelAttribute("productosDTO") ProductosDTO dto,
             BindingResult br,
+            Authentication authentication,
             Model model,
             RedirectAttributes redirectAttributes) {
+        // Solo ADMIN y EMPLEADO pueden guardar productos
+        if (authentication == null || 
+            authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CLIENTE"))) {
+            return "redirect:/productos";
+        }
+        
         if (br.hasErrors())
             return "productos/form";
 
