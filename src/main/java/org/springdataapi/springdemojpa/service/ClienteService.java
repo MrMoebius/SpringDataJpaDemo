@@ -5,7 +5,7 @@ import org.springdataapi.springdemojpa.models.ClientesDTO;
 import org.springdataapi.springdemojpa.models.Empleados;
 import org.springdataapi.springdemojpa.repository.ClientesRepository;
 import org.springdataapi.springdemojpa.repository.EmpleadosRepository;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -84,11 +84,7 @@ public class ClienteService {
         if (!clientesRepository.existsById(id)) {
             throw new RuntimeException("Cliente no existe");
         }
-        try {
-            clientesRepository.deleteById(id);
-        } catch (DataIntegrityViolationException e) {
-            throw new RuntimeException("No se puede eliminar el cliente porque tiene registros relacionados (facturas, presupuestos, etc.)");
-        }
+        clientesRepository.deleteById(id);
     }
 
     public Clientes actualizar(Integer id, ClientesDTO dto) {
@@ -132,15 +128,21 @@ public class ClienteService {
         return clientesRepository.save(cliente);
     }
 
+    public List<Clientes> BuscarClientePorEmpleadoyFecha(Integer idEmpleado, LocalDate  fechaDesde)
+    {
+        return  clientesRepository.BusacarClientePorEmpleadoyFecha(idEmpleado, fechaDesde);
+
+    }
+
     private void validarCampos(ClientesDTO dto) {
         if (dto == null) throw new RuntimeException("DTO obligatorio");
 
-        if (dto.getNombre() == null || dto.getNombre().isBlank()) {
+        if (dto.getNombre() == null || dto.getNombre().trim().isEmpty()) {
             throw new RuntimeException("Nombre obligatorio");
         }
 
-        if (dto.getPassword() == null || dto.getPassword().isBlank()) {
-            throw new RuntimeException("Ponle contraseña subnormal");
+        if (dto.getPassword() == null || dto.getPassword().trim().isEmpty()) {
+            dto.setPassword("PENDIENTE"); // ajusta si quieres obligatoria
         }
 
         if (dto.getEmail() == null || dto.getEmail().trim().isEmpty() || !dto.getEmail().contains("@")) {
@@ -180,7 +182,7 @@ public class ClienteService {
         t = t.replaceAll("\\s+", ""); // esto quita espacios
 
         if (t.length() > 9) {
-            throw new IllegalArgumentException("Pero que número es ese subnormal, pon uno de verdad");
+            throw new IllegalArgumentException("El teléfono supera la longitud máxima permitida.");
         }
 
         if (!t.matches("\\d+")) {

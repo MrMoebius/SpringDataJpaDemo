@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consulta de Productos</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div class="container">
+    <h1>Consulta de Productos</h1>
+
+    <form th:action="@{/consultas/productos}" method="get">
+        <div class="form-group">
+            <label class="form-label" for="categoria">Categoría:</label>
+            <select class="form-select" id="categoria" name="categoria"><option value="Ciclo Formativo" th:selected="${param.categoria == 'Ciclo Formativo'}">Ciclo Formativo</option>
+                <option value="Formación Complementaria" th:selected="${param.categoria == 'Formación Complementaria'}">Formación Complementaria</option>
+
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="precioMin">Precio mínimo:</label>
+            <input class="form-control" type="number" id="precioMin" name="precioMin"
+                   th:value="${precioMinSeleccionado}" placeholder="Ej. 100">
+        </div>
+
+        <button class="btn btn-primary" type="submit">Filtrar</button>
+    </form>
+
+    <hr>
+
+    <div th:if="${mensaje}" class="alert alert-danger" th:text="${mensaje}"></div>
+
+    <!-- Tabla de resultados -->
+    <table th:if="${productos}" class="m-top">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Categoría</th>
+            <th>Precio</th>
+            <th>Activo</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="producto : ${productos}">
+            <td th:text="${producto.id}"></td>
+            <td th:text="${producto.nombre}"></td>
+            <td th:text="${producto.descripcion}"></td>
+            <td th:text="${producto.categoria}"></td>
+            <td th:text="${#numbers.formatDecimal(producto.precio, 1, 'COMMA', 2, 'POINT')}"></td>
+            <td th:text="${producto.activo} ? 'Sí' : 'No'"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div th:if="${productos != null} and ${productos.isEmpty()}" class="alert alert-info m-top">
+        No se encontraron productos con los filtros aplicados.
+    </div>
+</div>
+</body>
+</html>

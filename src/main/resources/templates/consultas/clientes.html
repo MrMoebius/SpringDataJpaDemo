@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Consulta de Clientes</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Título -->
+    <h2>Consulta de clientes por empleado y fecha</h2>
+
+    <!-- FORMULARIO DE BÚSQUEDA -->
+    <form th:action="@{/consultas/clientes}" method="get">
+
+        <div class="form-group m-bottom">
+            <label class="form-label">Empleado responsable</label>
+            <select name="idEmpleado" class="form-select" required>
+                <option value="">-- Seleccionar --</option>
+                <option th:each="empleado : ${empleados}"
+                        th:value="${empleado.id}"
+                        th:text="${empleado.nombre}"
+                        th:selected="${empleado.id == idEmpleado}">
+                </option>
+            </select>
+        </div>
+
+        <div class="form-group m-bottom">
+            <label class="form-label">Fecha desde</label>
+            <input type="date" name="fechaDesde" class="form-control" th:value="${fechaDesde}">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
+
+    <!-- RESULTADOS -->
+    <div th:if="${clientes != null}" class="m-top">
+
+        <h3>Resultados</h3>
+
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Fecha alta</th>
+                <th>Empleado</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="cliente : ${clientes}">
+                <td th:text="${cliente.id}"></td>
+                <td th:text="${cliente.nombre}"></td>
+                <td th:text="${cliente.email}"></td>
+                <td th:text="${cliente.fechaAlta}"></td>
+                <td th:text="${cliente.idEmpleadoResponsable.nombre}"></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <p th:if="${#lists.isEmpty(clientes)}" class="m-top text-center">
+            No se encontraron clientes
+        </p>
+    </div>
+
+    <!-- VOLVER -->
+    <div class="m-top text-center">
+        <a th:href="@{/}" class="btn btn-secondary">Volver al menú</a>
+    </div>
+
+</div>
+
+</body>
+</html>
