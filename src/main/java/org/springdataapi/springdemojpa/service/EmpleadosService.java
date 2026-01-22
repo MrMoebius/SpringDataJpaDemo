@@ -201,7 +201,11 @@ public class EmpleadosService {
         String t = telefono.trim();
         if (t.isBlank() && t.length() < 10) return null;
 
-        t = t.replaceAll("\\s+", ""); // quita espacios
+        t = t.replaceAll("\\s+", ""); // esto quita espacios
+
+        if (t.length() > 9) {
+            throw new IllegalArgumentException("Pero que número es ese subnormal");
+        }
 
         if (!t.matches("\\d+")) {
             throw new RuntimeException("El teléfono solo puede contener números (0-9)");
