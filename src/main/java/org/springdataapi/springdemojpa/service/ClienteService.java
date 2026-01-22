@@ -134,8 +134,8 @@ public class ClienteService {
             throw new RuntimeException("Nombre obligatorio");
         }
 
-        if (dto.getPassword() == null || dto.getPassword().trim().isEmpty()) {
-            dto.setPassword("PENDIENTE"); // ajusta si quieres obligatoria
+        if (dto.getPassword() == null || dto.getPassword().isBlank()) {
+            throw new RuntimeException("Ponle contraseña subnormal");
         }
 
         if (dto.getEmail() == null || dto.getEmail().trim().isEmpty() || !dto.getEmail().contains("@")) {
@@ -175,7 +175,7 @@ public class ClienteService {
         t = t.replaceAll("\\s+", ""); // esto quita espacios
 
         if (t.length() > 9) {
-            throw new IllegalArgumentException("El teléfono supera la longitud máxima permitida.");
+            throw new IllegalArgumentException("Pero que número es ese subnormal, pon uno de verdad");
         }
 
         if (!t.matches("\\d+")) {

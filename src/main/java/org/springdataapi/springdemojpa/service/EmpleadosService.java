@@ -40,7 +40,7 @@ public class EmpleadosService {
     }
 
     public Optional<Empleados> findByTelefono(String telefono) {
-        String tel = normalizarYValidarTelefono(telefono); // ✅ solo números
+        String tel = normalizarYValidarTelefono(telefono);
         if (tel == null) throw new RuntimeException("Teléfono obligatorio");
         return Optional.ofNullable(empleadosRepository.findByTelefono(tel)
                 .orElseThrow(() -> new RuntimeException("Empleado no encontrado por teléfono")));
@@ -63,7 +63,6 @@ public class EmpleadosService {
             throw new RuntimeException("Email ya registrado");
         }
 
-        // ✅ normaliza (quita espacios) y valida solo dígitos
         String telefonoNormalizado = normalizarYValidarTelefono(dto.getTelefono());
 
         if (telefonoNormalizado != null && empleadosRepository.existsByTelefono(telefonoNormalizado)) {
@@ -77,12 +76,11 @@ public class EmpleadosService {
         e.setNombre(dto.getNombre().trim());
         e.setEmail(dto.getEmail().trim());
         e.setTelefono(telefonoNormalizado);
-        e.setPassword(dto.getPassword()); // aquí no has pedido hash
+        e.setPassword(dto.getPassword());
         e.setIdRol(rol);
 
         e.setFechaIngreso(dto.getFechaIngreso() != null ? dto.getFechaIngreso() : LocalDate.now());
 
-        // ✅ aquí: soporta "Sí/No", "true/false", "activo/inactivo"
         e.setEstado(normalizarEstado(dto.getEstado()));
 
         empleadosRepository.save(e);
@@ -108,7 +106,6 @@ public class EmpleadosService {
             throw new RuntimeException("Email ya registrado");
         }
 
-        // ✅ normaliza (quita espacios) y valida solo dígitos
         String nuevoTelefono = normalizarYValidarTelefono(dto.getTelefono());
 
         if (nuevoTelefono != null && (e.getTelefono() == null || !nuevoTelefono.equals(e.getTelefono()))
@@ -124,17 +121,14 @@ public class EmpleadosService {
             e.setFechaIngreso(dto.getFechaIngreso());
         }
 
-        // ✅ aquí: si viene, normaliza (Sí/No/true/false/activo/inactivo)
         if (dto.getEstado() != null) {
             e.setEstado(normalizarEstado(dto.getEstado()));
         }
 
-        // ✅ solo si viene
         if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
             e.setPassword(dto.getPassword());
         }
 
-        // ✅ rol
         if (dto.getIdRol() != null) {
             RolesEmpleado rol = rolesEmpleadoRepository.findById(dto.getIdRol())
                     .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
@@ -154,7 +148,7 @@ public class EmpleadosService {
             throw new RuntimeException("Email obligatorio");
         }
         if (dto.getPassword() == null || dto.getPassword().isBlank()) {
-            throw new RuntimeException("Password obligatorio");
+            throw new RuntimeException("Ponle contraseña subnormal");
         }
         if (dto.getIdRol() == null) {
             throw new RuntimeException("Rol obligatorio");
@@ -170,11 +164,10 @@ public class EmpleadosService {
         if (dto.getEmail() == null || dto.getEmail().isBlank()) {
             throw new RuntimeException("Email obligatorio");
         }
-        // password / rol / fechaIngreso / estado: opcionales en update
     }
 
     /**
-     * ✅ Normaliza el estado para soportar un <select> "Sí/No"
+     * Normaliza el estado para soportar un <select> "Sí/No"
      * - null o vacío => "activo"
      * - "si"/"sí"/"true"/"1"/"activo" => "activo"
      * - "no"/"false"/"0"/"inactivo" => "inactivo"
@@ -204,7 +197,7 @@ public class EmpleadosService {
         t = t.replaceAll("\\s+", ""); // esto quita espacios
 
         if (t.length() > 9) {
-            throw new IllegalArgumentException("Pero que número es ese subnormal");
+            throw new IllegalArgumentException("Pero que número es ese subnormal, pon uno de verdad");
         }
 
         if (!t.matches("\\d+")) {

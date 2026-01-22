@@ -2,11 +2,9 @@ package org.springdataapi.springdemojpa.models;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class ProductosDTO {
 
     private Integer id;
