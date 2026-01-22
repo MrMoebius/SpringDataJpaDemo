@@ -44,6 +44,7 @@
             <div class="m-bottom">
                 <label class="form-label">Tipo de cliente</label>
                 <select th:field="*{tipo_cliente}" class="form-select">
+                    <option value="" disabled selected>Selecciona</option>
                     <option th:value="'EMPRESA'">EMPRESA</option>
                     <option th:value="'PARTICULAR'">PARTICULAR</option>
                 </select>

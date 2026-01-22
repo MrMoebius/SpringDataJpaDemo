@@ -61,6 +61,7 @@
             <div class="m-bottom">
                 <label class="form-label">Estado</label>
                 <select th:field="*{estado}" class="form-select">
+                    <option value="" disabled selected>Selecciona</option>
                     <option th:value="'activo'">Activo</option>
                     <option th:value="'inactivo'">Inactivo</option>
                 </select>

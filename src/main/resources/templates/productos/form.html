@@ -34,13 +34,23 @@
 
             <div class="m-bottom">
                 <label class="form-label">Categoría</label>
-                <input type="text" th:field="*{categoria}" class="form-control"/>
+                <select th:field="*{categoria}" class="form-select">
+                    <option th:value="'CICLO FORMATIVO'">CICLO FORMATIVO</option>
+                    <option th:value="'FORMACION COMPLEMENTARIA'">FORMACION COMPLEMENTARIA</option>
+                </select>
             </div>
 
             <div class="m-bottom">
                 <label class="form-label">Precio</label>
-                <input type="number" step="0.01" th:field="*{precio}" class="form-control"/>
+                <input type="text"
+                       th:field="*{precio}"
+                       class="form-control"
+                       inputmode="decimal"
+                       placeholder="0,00"
+                       pattern="^\d+(,\d{1,2})?$"
+                       title="Formato: 1234,56"/>
             </div>
+
 
             <div class="m-bottom">
                 <label class="form-label">Activo</label>
