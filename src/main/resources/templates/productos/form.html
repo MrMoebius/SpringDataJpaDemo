@@ -42,15 +42,8 @@
 
             <div class="m-bottom">
                 <label class="form-label">Precio</label>
-                <input type="text"
-                       th:field="*{precio}"
-                       class="form-control"
-                       inputmode="decimal"
-                       placeholder="0,00"
-                       pattern="^\d+(,\d{1,2})?$"
-                       title="Formato: 1234,56"/>
+                <input type="number" step="0.01" th:field="*{precio}" class="form-control"/>
             </div>
-
 
             <div class="m-bottom">
                 <label class="form-label">Activo</label>
