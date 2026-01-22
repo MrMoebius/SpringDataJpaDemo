@@ -2,51 +2,57 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulario Producto</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
-<div class="container mt-4">
-    <h2 th:text="${productosDTO.id} == null ? 'Nuevo Producto' : 'Editar Producto'"></h2>
-
-    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-
-    <form th:action="@{/productos/guardar}" th:object="${productosDTO}" method="post">
-        <input type="hidden" th:field="*{id}"/>
-
-        <div class="mb-3">
-            <label class="form-label">Nombre *</label>
-            <input type="text" th:field="*{nombre}" class="form-control"
-                   th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid' : ''"/>
-            <div class="invalid-feedback" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+    <div class="container">
+        <div class="navbar">
+            <a th:href="@{/productos}" class="nav-title">← Volver a Productos</a>
+            <a th:href="@{/}" class="nav-title">Inicio</a>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">Descripción</label>
-            <input type="text" th:field="*{descripcion}" class="form-control"/>
-        </div>
+        <h2 th:text="${productosDTO.id} == null ? 'Nuevo Producto' : 'Editar Producto'"></h2>
 
-        <div class="mb-3">
-            <label class="form-label">Categoría</label>
-            <input type="text" th:field="*{categoria}" class="form-control"/>
-        </div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-        <div class="mb-3">
-            <label class="form-label">Precio</label>
-            <input type="number" step="0.01" th:field="*{precio}" class="form-control"/>
-        </div>
+        <form th:action="@{/productos/guardar}" th:object="${productosDTO}" method="post">
+            <input type="hidden" th:field="*{id}"/>
 
-        <div class="mb-3">
-            <label class="form-label">Activo</label>
-            <select th:field="*{activo}" class="form-select">
-                <option th:value="true">Sí</option>
-                <option th:value="false">No</option>
-            </select>
-        </div>
+            <div class="m-bottom">
+                <label class="form-label">Nombre *</label>
+                <input type="text" th:field="*{nombre}" class="form-control"
+                       th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid' : ''"/>
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+            </div>
 
-        <button type="submit" class="btn btn-primary">Guardar</button>
-        <a th:href="@{/productos}" class="btn btn-secondary">Cancelar</a>
-    </form>
-</div>
+            <div class="m-bottom">
+                <label class="form-label">Descripción</label>
+                <input type="text" th:field="*{descripcion}" class="form-control"/>
+            </div>
+
+            <div class="m-bottom">
+                <label class="form-label">Categoría</label>
+                <input type="text" th:field="*{categoria}" class="form-control"/>
+            </div>
+
+            <div class="m-bottom">
+                <label class="form-label">Precio</label>
+                <input type="number" step="0.01" th:field="*{precio}" class="form-control"/>
+            </div>
+
+            <div class="m-bottom">
+                <label class="form-label">Activo</label>
+                <select th:field="*{activo}" class="form-select">
+                    <option th:value="true">Sí</option>
+                    <option th:value="false">No</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a th:href="@{/productos}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
 </body>
 </html>
