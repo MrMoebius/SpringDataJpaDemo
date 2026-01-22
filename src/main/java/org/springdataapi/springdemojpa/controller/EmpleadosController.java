@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/empleados")
@@ -61,7 +62,8 @@ public class EmpleadosController {
     public String guardar(
             @Valid @ModelAttribute("empleadosDTO") EmpleadosDTO dto,
             BindingResult result,
-            Model model) {
+            Model model,
+            RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             model.addAttribute("roles", rolesEmpleadoService.findAll());
             return "empleados/form";
@@ -70,8 +72,10 @@ public class EmpleadosController {
         try {
             if (dto.getId() == null) {
                 empleadosService.crear(dto);
+                redirectAttributes.addFlashAttribute("success", "Empleado añadido correctamente");
             } else {
                 empleadosService.actualizar(dto.getId(), dto);
+                redirectAttributes.addFlashAttribute("success", "Empleado modificado correctamente");
             }
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
@@ -83,9 +87,10 @@ public class EmpleadosController {
     }
 
     @GetMapping("/{id}/eliminar")
-    public String eliminar(@PathVariable Integer id, Model model) {
+    public String eliminar(@PathVariable Integer id, Model model, RedirectAttributes redirectAttributes) {
         try {
             empleadosService.eliminar(id);
+            redirectAttributes.addFlashAttribute("success", "Empleado eliminado correctamente");
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("empleados", empleadosService.findAll());

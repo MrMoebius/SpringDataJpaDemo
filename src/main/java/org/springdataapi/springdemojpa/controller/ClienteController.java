@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -97,7 +98,8 @@ public class ClienteController {
     public String guardarCliente(
             @Valid @ModelAttribute("clienteDTO") ClientesDTO dto,
             BindingResult result,
-            Model model) {
+            Model model,
+            RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             model.addAttribute("empleados", empleadosService.findAll());
             return "clientes/form";
@@ -106,8 +108,10 @@ public class ClienteController {
         try {
             if (dto.getId() == null) {
                 clienteService.crear(dto);
+                redirectAttributes.addFlashAttribute("success", "Cliente añadido correctamente");
             } else {
                 clienteService.actualizar(dto.getId(), dto);
+                redirectAttributes.addFlashAttribute("success", "Cliente modificado correctamente");
             }
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
@@ -119,7 +123,7 @@ public class ClienteController {
     }
 
     @GetMapping("/{id}/eliminar")
-    public String eliminarCliente(@PathVariable Integer id, Authentication authentication, Model model) {
+    public String eliminarCliente(@PathVariable Integer id, Authentication authentication, Model model, RedirectAttributes redirectAttributes) {
         // Solo ADMIN y EMPLEADO pueden eliminar
         if (authentication == null || 
             authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CLIENTE"))) {
@@ -127,6 +131,7 @@ public class ClienteController {
         }
         try {
             clienteService.eliminar(id);
+            redirectAttributes.addFlashAttribute("success", "Cliente eliminado correctamente");
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("clientes", clienteService.findAll());

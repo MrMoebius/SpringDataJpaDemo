@@ -280,6 +280,15 @@ form {
     border-left: 4px solid;
 }
 
+.alert-success {
+    background-color: #2d5a3d;
+    color: #81c784;
+    padding: 15px;
+    border-radius: 6px;
+    border-left: 4px solid #4caf50;
+    margin-bottom: 20px;
+}
+
 .alert-danger {
     background-color: rgba(211, 47, 47, 0.1);
     border-color: #d32f2f;

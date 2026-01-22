@@ -19,6 +19,7 @@
         </div>
 
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
 
         <div th:if="${#lists.isEmpty(clientes)}" class="alert alert-info">
             No hay clientes registrados

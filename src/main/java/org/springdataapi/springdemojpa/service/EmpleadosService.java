@@ -92,7 +92,11 @@ public class EmpleadosService {
         if (!empleadosRepository.existsById(id)) {
             throw new RuntimeException("Empleado no existe");
         }
-        empleadosRepository.deleteById(id);
+        try {
+            empleadosRepository.deleteById(id);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new RuntimeException("No se puede eliminar el empleado porque tiene registros relacionados (clientes asignados, facturas, etc.)");
+        }
     }
 
     public Empleados actualizar(Integer id, EmpleadosDTO dto) {
