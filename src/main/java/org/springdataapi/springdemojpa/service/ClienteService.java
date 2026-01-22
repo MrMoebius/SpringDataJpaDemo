@@ -5,6 +5,7 @@ import org.springdataapi.springdemojpa.models.ClientesDTO;
 import org.springdataapi.springdemojpa.models.Empleados;
 import org.springdataapi.springdemojpa.repository.ClientesRepository;
 import org.springdataapi.springdemojpa.repository.EmpleadosRepository;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -125,6 +126,12 @@ public class ClienteService {
         }
 
         return clientesRepository.save(cliente);
+    }
+
+    public List<Clientes> BuscarClientePorEmpleadoyFecha(Integer idEmpleado, LocalDate  fechaDesde)
+    {
+        return  clientesRepository.BusacarClientePorEmpleadoyFecha(idEmpleado, fechaDesde);
+
     }
 
     private void validarCampos(ClientesDTO dto) {

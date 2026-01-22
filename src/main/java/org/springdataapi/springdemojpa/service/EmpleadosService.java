@@ -5,6 +5,7 @@ import org.springdataapi.springdemojpa.models.EmpleadosDTO;
 import org.springdataapi.springdemojpa.models.RolesEmpleado;
 import org.springdataapi.springdemojpa.repository.EmpleadosRepository;
 import org.springdataapi.springdemojpa.repository.RolesEmpleadoRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -63,7 +64,6 @@ public class EmpleadosService {
             throw new RuntimeException("Email ya registrado");
         }
 
-        // ✅ normaliza (quita espacios) y valida solo dígitos
         String telefonoNormalizado = normalizarYValidarTelefono(dto.getTelefono());
 
         if (telefonoNormalizado != null && empleadosRepository.existsByTelefono(telefonoNormalizado)) {
@@ -82,7 +82,6 @@ public class EmpleadosService {
 
         e.setFechaIngreso(dto.getFechaIngreso() != null ? dto.getFechaIngreso() : LocalDate.now());
 
-        // ✅ aquí: soporta "Sí/No", "true/false", "activo/inactivo"
         e.setEstado(normalizarEstado(dto.getEstado()));
 
         empleadosRepository.save(e);
@@ -108,7 +107,6 @@ public class EmpleadosService {
             throw new RuntimeException("Email ya registrado");
         }
 
-        // ✅ normaliza (quita espacios) y valida solo dígitos
         String nuevoTelefono = normalizarYValidarTelefono(dto.getTelefono());
 
         if (nuevoTelefono != null && (e.getTelefono() == null || !nuevoTelefono.equals(e.getTelefono()))
@@ -124,17 +122,15 @@ public class EmpleadosService {
             e.setFechaIngreso(dto.getFechaIngreso());
         }
 
-        // ✅ aquí: si viene, normaliza (Sí/No/true/false/activo/inactivo)
         if (dto.getEstado() != null) {
             e.setEstado(normalizarEstado(dto.getEstado()));
         }
 
-        // ✅ solo si viene
         if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
             e.setPassword(dto.getPassword());
         }
 
-        // ✅ rol
+
         if (dto.getIdRol() != null) {
             RolesEmpleado rol = rolesEmpleadoRepository.findById(dto.getIdRol())
                     .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
@@ -142,6 +138,11 @@ public class EmpleadosService {
         }
 
         return empleadosRepository.save(e);
+    }
+
+    public List<Empleados> BuscarPorLetras(String letra)
+    {
+        return empleadosRepository.buscarPorLetra(letra);
     }
 
     private void validarCamposCrear(EmpleadosDTO dto) {

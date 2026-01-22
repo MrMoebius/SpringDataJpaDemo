@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Consultas - Sistema CRM</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<div class="container">
+    <h1>Consultas</h1>
+
+    <div class="menu-container">
+        <div class="menu-item">
+            <a th:href="@{/consultas/clientes}">Clientes</a>
+            <p>Realizar consultas sobre clientes</p>
+        </div>
+        <div class="menu-item">
+            <a th:href="@{/consultas/productos}">Productos</a>
+            <p>Realizar consultas sobre productos</p>
+        </div>
+        <div class="menu-item">
+            <a th:href="@{/consultas/empleados}">Empleados</a>
+            <p>Realizar consultas sobre empleados</p>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <span class="footer-title">Sistema CRM</span>
+        <form th:action="@{/logout}" method="post" class="footer-logout">
+            <button type="submit" class="logout-link">Cerrar Sesión</button>
+        </form>
+    </footer>
+</div>
+</body>
+</html>

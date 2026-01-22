@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empleados</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<div class="navbar">
+    <div class="nav-title">Gestión de Empleados</div>
+    <div>
+        <a href="/">Inicio</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <h1>Lista de Empleados</h1>
+
+    <form th:action="@{/consultas/empleados}" method="get">
+        <label for="letra" class="form-label">Filtrar por letra inicial:</label>
+        <input type="text" id="letra" name="letra" maxlength="1" placeholder="Ingrese una letra" class="form-control"
+               th:value="${letra}">
+        <button type="submit" class="btn btn-primary btn-sm m-top">Filtrar</button>
+    </form>
+
+    <div class="m-top">
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Email</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="empleado : ${empleados}">
+                <td th:text="${empleado.id}"></td>
+                <td th:text="${empleado.nombre}"></td>
+                <td th:text="${empleado.email}"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(empleados)}">
+                <td colspan="4" class="text-center">No se encontraron empleados</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+</div>
+
+<footer class="footer">
+    <span class="footer-title">Sistema CRM</span>
+    <form th:action="@{/logout}" method="post" class="footer-logout">
+        <button type="submit" class="logout-link">Cerrar Sesión</button>
+    </form>
+</footer>
+</div>
+
+</body>
+</html>

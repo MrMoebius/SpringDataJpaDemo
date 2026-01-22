@@ -5,6 +5,7 @@ import org.springdataapi.springdemojpa.models.ProductosDTO;
 import org.springdataapi.springdemojpa.repository.ProductosRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -97,6 +98,11 @@ public class ProductosService {
         if (id == null) throw new RuntimeException("Id obligatorio");
         if (!productosRepository.existsById(id)) throw new RuntimeException("Producto no existe");
         productosRepository.deleteById(id);
+    }
+
+    public List<Productos> BuscarProductosFiltrados(String categoria, Double precioMin)
+    {
+        return productosRepository.buscarProductosFiltrados(categoria,precioMin);
     }
 
     private void validarCamposCrear(ProductosDTO dto) {
