@@ -9,11 +9,11 @@
 <body>
     <div class="container">
         <div class="navbar">
-            <a th:href="@{/clientes}" class="nav-title">← Volver a Clientes</a>
+            <a th:href="@{/clientes}" class="nav-title">← Volver a Clientes</a> //@ para rutas
             <a th:href="@{/}" class="nav-title">Inicio</a>
         </div>
 
-        <h2 th:text="${clienteDTO.id} == null ? 'Nuevo Cliente' : 'Editar Cliente'"></h2>
+        <h2 th:text="${clienteDTO.id} == null ? 'Nuevo Cliente' : 'Editar Cliente'"></h2> //“datos generales” que vienen del controlador (Model).
 
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
@@ -23,7 +23,7 @@
             <div class="m-bottom">
                 <label class="form-label">Nombre *</label>
                 <input type="text" th:field="*{nombre}" class="form-control"
-                       th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid' : ''"/>
+                       th:classappend="${#fields.hasErrors('nombre')} ? 'is-invalid' : ''"/> // * para campos del formulario” del objeto del th:object
                 <div class="invalid-feedback" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
             </div>
 
@@ -71,3 +71,4 @@
     </div>
 </body>
 </html>
+
