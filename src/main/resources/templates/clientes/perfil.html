@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Perfil</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <div class="container">
+        <div class="navbar">
+            <a th:href="@{/}" class="nav-title">← Volver al Inicio</a>
+            <span class="nav-title">Sistema CRM</span>
+        </div>
+
+        <h1>Mi Perfil</h1>
+
+        <div class="alert alert-info">
+            Esta es tu información personal. Solo puedes visualizarla.
+        </div>
+
+        <table>
+            <tbody>
+                <tr>
+                    <th>ID</th>
+                    <td th:text="${cliente.id}"></td>
+                </tr>
+                <tr>
+                    <th>Nombre</th>
+                    <td th:text="${cliente.nombre}"></td>
+                </tr>
+                <tr>
+                    <th>Email</th>
+                    <td th:text="${cliente.email}"></td>
+                </tr>
+                <tr>
+                    <th>Teléfono</th>
+                    <td th:text="${cliente.telefono != null ? cliente.telefono : 'No proporcionado'}"></td>
+                </tr>
+                <tr>
+                    <th>Tipo de Cliente</th>
+                    <td th:text="${cliente.tipoCliente != null ? cliente.tipoCliente : 'No especificado'}"></td>
+                </tr>
+                <tr>
+                    <th>Empleado Responsable</th>
+                    <td th:text="${cliente.idEmpleadoResponsable != null ? cliente.idEmpleadoResponsable.nombre : 'Sin asignar'}"></td>
+                </tr>
+                <tr>
+                    <th>Fecha de Alta</th>
+                    <td th:text="${cliente.fechaAlta != null ? #temporals.format(cliente.fechaAlta, 'dd/MM/yyyy') : 'No registrada'}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <footer class="footer">
+            <span class="footer-title">Sistema CRM</span>
+            <form th:action="@{/logout}" method="post" class="footer-logout">
+                <button type="submit" class="logout-link">Cerrar Sesión</button>
+            </form>
+        </footer>
+    </div>
+</body>
+</html>

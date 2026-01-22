@@ -21,6 +21,10 @@ public class ProductosService {
         return productosRepository.findAll();
     }
 
+    public List<Productos> findProductosActivos() {
+        return productosRepository.findByActivo(true);
+    }
+
     public Productos findById(Integer id) {
         if (id == null) throw new RuntimeException("Id obligatorio");
         return productosRepository.findById(id)

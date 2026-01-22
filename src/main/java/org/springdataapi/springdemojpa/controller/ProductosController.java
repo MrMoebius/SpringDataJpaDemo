@@ -4,6 +4,8 @@ import jakarta.validation.Valid;
 import org.springdataapi.springdemojpa.models.Productos;
 import org.springdataapi.springdemojpa.models.ProductosDTO;
 import org.springdataapi.springdemojpa.service.ProductosService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -26,7 +28,12 @@ public class ProductosController {
     }
 
     @GetMapping("/nuevo")
-    public String nuevo(Model model) {
+    public String nuevo(Authentication authentication, Model model) {
+        // Solo ADMIN y EMPLEADO pueden crear productos
+        if (authentication == null || 
+            authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CLIENTE"))) {
+            return "redirect:/productos";
+        }
         ProductosDTO dto = new ProductosDTO();
         dto.setActivo(true);
         model.addAttribute("productosDTO", dto);
@@ -70,7 +77,12 @@ public class ProductosController {
     }
 
     @GetMapping("/eliminar/{id}")
-    public String eliminar(@PathVariable Integer id, Model model) {
+    public String eliminar(@PathVariable Integer id, Authentication authentication, Model model) {
+        // Solo ADMIN y EMPLEADO pueden eliminar
+        if (authentication == null || 
+            authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CLIENTE"))) {
+            return "redirect:/productos";
+        }
         try {
             productosService.eliminar(id);
         } catch (RuntimeException e) {

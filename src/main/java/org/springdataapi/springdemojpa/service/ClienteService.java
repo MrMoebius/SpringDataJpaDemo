@@ -41,6 +41,12 @@ public class ClienteService {
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado por email")));
     }
 
+    public Clientes findByEmailOrThrow(String email) {
+        if (email == null || email.isBlank()) throw new RuntimeException("Email obligatorio");
+        return clientesRepository.findByEmail(email.trim())
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+    }
+
     public Optional<Clientes> findByTelefono(String telefono) {
         String tel = normalizarYValidarTelefono(telefono);
         if (tel == null) throw new RuntimeException("Teléfono obligatorio");
