@@ -130,7 +130,7 @@ public class ClienteService {
     private void validarCampos(ClientesDTO dto) {
         if (dto == null) throw new RuntimeException("DTO obligatorio");
 
-        if (dto.getNombre() == null || dto.getNombre().trim().isEmpty()) {
+        if (dto.getNombre() == null || dto.getNombre().isBlank()) {
             throw new RuntimeException("Nombre obligatorio");
         }
 
