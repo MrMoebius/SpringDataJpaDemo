@@ -18,6 +18,8 @@
             <a th:href="@{/empleados/nuevo}" class="btn btn-primary">Nuevo Empleado</a>
         </div>
 
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
         <div th:if="${#lists.isEmpty(empleados)}" class="alert alert-info">
             No hay empleados registrados
         </div>

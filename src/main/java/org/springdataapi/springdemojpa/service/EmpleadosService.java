@@ -5,6 +5,7 @@ import org.springdataapi.springdemojpa.models.EmpleadosDTO;
 import org.springdataapi.springdemojpa.models.RolesEmpleado;
 import org.springdataapi.springdemojpa.repository.EmpleadosRepository;
 import org.springdataapi.springdemojpa.repository.RolesEmpleadoRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -91,7 +92,11 @@ public class EmpleadosService {
         if (!empleadosRepository.existsById(id)) {
             throw new RuntimeException("Empleado no existe");
         }
-        empleadosRepository.deleteById(id);
+        try {
+            empleadosRepository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new RuntimeException("No se puede eliminar el empleado porque tiene registros relacionados (clientes asignados, facturas, etc.)");
+        }
     }
 
     public Empleados actualizar(Integer id, EmpleadosDTO dto) {

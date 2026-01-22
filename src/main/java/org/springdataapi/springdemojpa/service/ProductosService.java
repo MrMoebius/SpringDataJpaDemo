@@ -3,6 +3,7 @@ package org.springdataapi.springdemojpa.service;
 import org.springdataapi.springdemojpa.models.Productos;
 import org.springdataapi.springdemojpa.models.ProductosDTO;
 import org.springdataapi.springdemojpa.repository.ProductosRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.text.Normalizer;
@@ -89,7 +90,11 @@ public class ProductosService {
     public void eliminar(Integer id) {
         if (id == null) throw new RuntimeException("Id obligatorio");
         if (!productosRepository.existsById(id)) throw new RuntimeException("Producto no existe");
-        productosRepository.deleteById(id);
+        try {
+            productosRepository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new RuntimeException("No se puede eliminar el producto porque tiene registros relacionados (facturas, presupuestos, etc.)");
+        }
     }
 
     private void validarCampos(ProductosDTO dto) {

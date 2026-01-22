@@ -83,8 +83,18 @@ public class ClienteController {
     }
 
     @GetMapping("/{id}/eliminar")
-    public String eliminarCliente(@PathVariable Integer id) {
-        clienteService.eliminar(id);
+    public String eliminarCliente(@PathVariable Integer id, Model model) {
+        try {
+            clienteService.eliminar(id);
+        } catch (RuntimeException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("clientes", clienteService.findAll());
+            return "clientes/list";
+        } catch (Exception e) {
+            model.addAttribute("error", "No se puede eliminar el cliente porque tiene registros relacionados (facturas, presupuestos, etc.)");
+            model.addAttribute("clientes", clienteService.findAll());
+            return "clientes/list";
+        }
         return "redirect:/clientes";
     }
 }

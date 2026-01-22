@@ -83,8 +83,18 @@ public class EmpleadosController {
     }
 
     @GetMapping("/{id}/eliminar")
-    public String eliminar(@PathVariable Integer id) {
-        empleadosService.eliminar(id);
+    public String eliminar(@PathVariable Integer id, Model model) {
+        try {
+            empleadosService.eliminar(id);
+        } catch (RuntimeException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("empleados", empleadosService.findAll());
+            return "empleados/list";
+        } catch (Exception e) {
+            model.addAttribute("error", "No se puede eliminar el empleado porque tiene registros relacionados (clientes asignados, facturas, etc.)");
+            model.addAttribute("empleados", empleadosService.findAll());
+            return "empleados/list";
+        }
         return "redirect:/empleados";
     }
 }

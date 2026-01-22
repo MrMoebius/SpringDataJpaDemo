@@ -5,6 +5,7 @@ import org.springdataapi.springdemojpa.models.ClientesDTO;
 import org.springdataapi.springdemojpa.models.Empleados;
 import org.springdataapi.springdemojpa.repository.ClientesRepository;
 import org.springdataapi.springdemojpa.repository.EmpleadosRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -83,7 +84,11 @@ public class ClienteService {
         if (!clientesRepository.existsById(id)) {
             throw new RuntimeException("Cliente no existe");
         }
-        clientesRepository.deleteById(id);
+        try {
+            clientesRepository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            throw new RuntimeException("No se puede eliminar el cliente porque tiene registros relacionados (facturas, presupuestos, etc.)");
+        }
     }
 
     public Clientes actualizar(Integer id, ClientesDTO dto) {

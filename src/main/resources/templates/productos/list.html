@@ -18,6 +18,8 @@
             <a th:href="@{/productos/nuevo}" class="btn btn-success">Nuevo Producto</a>
         </div>
 
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
         <table>
             <thead>
                 <tr>

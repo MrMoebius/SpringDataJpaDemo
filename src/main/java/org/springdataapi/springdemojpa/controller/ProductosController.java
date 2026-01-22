@@ -70,8 +70,18 @@ public class ProductosController {
     }
 
     @GetMapping("/eliminar/{id}")
-    public String eliminar(@PathVariable Integer id) {
-        productosService.eliminar(id);
+    public String eliminar(@PathVariable Integer id, Model model) {
+        try {
+            productosService.eliminar(id);
+        } catch (RuntimeException e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("productos", productosService.findAll());
+            return "productos/list";
+        } catch (Exception e) {
+            model.addAttribute("error", "No se puede eliminar el producto porque tiene registros relacionados (facturas, presupuestos, etc.)");
+            model.addAttribute("productos", productosService.findAll());
+            return "productos/list";
+        }
         return "redirect:/productos";
     }
 
