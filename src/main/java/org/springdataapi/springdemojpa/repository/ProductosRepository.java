@@ -46,4 +46,5 @@ public interface ProductosRepository extends JpaRepository<Productos, Integer>
             @Param("precioMax") Double precioMax,
             @Param("activo") Boolean activo);
 
+    Integer id(Integer id);
 }

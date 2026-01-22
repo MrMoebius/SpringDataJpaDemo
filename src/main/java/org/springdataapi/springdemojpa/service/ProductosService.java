@@ -5,7 +5,6 @@ import org.springdataapi.springdemojpa.models.ProductosDTO;
 import org.springdataapi.springdemojpa.repository.ProductosRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -100,8 +99,16 @@ public class ProductosService {
 
     public void eliminar(Integer id) {
         if (id == null) throw new RuntimeException("Id obligatorio");
-        if (!productosRepository.existsById(id)) throw new RuntimeException("Producto no existe");
-        productosRepository.deleteById(id);
+        if (!productosRepository.existsById(id)) {
+            throw new RuntimeException("Producto no existe");
+        }
+        try {
+            productosRepository.deleteById(id);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new RuntimeException(
+                    "No se puede eliminar el producto porque tiene registros relacionados (líneas de pedido, facturas, etc.)"
+            );
+        }
     }
 
     public List<Productos> BuscarProductosFiltrados(String categoria, Double precioMin)
