@@ -41,6 +41,12 @@ public class ClienteService {
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado por email")));
     }
 
+    public Clientes findByEmailOrThrow(String email) {
+        if (email == null || email.isBlank()) throw new RuntimeException("Email obligatorio");
+        return clientesRepository.findByEmail(email.trim())
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+    }
+
     public Optional<Clientes> findByTelefono(String telefono) {
         String tel = normalizarYValidarTelefono(telefono);
         if (tel == null) throw new RuntimeException("Teléfono obligatorio");
@@ -93,7 +99,7 @@ public class ClienteService {
         Clientes cliente = clientesRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
-        validarCampos(dto);
+        validarCamposActualizar(dto);
 
         String nuevoEmail = dto.getEmail().trim();
         String nuevoTelefono = normalizarYValidarTelefono(dto.getTelefono());
@@ -131,7 +137,13 @@ public class ClienteService {
     public List<Clientes> BuscarClientePorEmpleadoyFecha(Integer idEmpleado, LocalDate  fechaDesde)
     {
         return  clientesRepository.BusacarClientePorEmpleadoyFecha(idEmpleado, fechaDesde);
+    }
 
+    public List<Clientes> buscarClientesFiltrados(
+            String telefono, String email, String tipoCliente, 
+            Integer idEmpleado, LocalDate fechaDesde) {
+        return clientesRepository.buscarClientesFiltrados(
+                telefono, email, tipoCliente, idEmpleado, fechaDesde);
     }
 
     private void validarCampos(ClientesDTO dto) {
@@ -142,14 +154,47 @@ public class ClienteService {
         }
 
         if (dto.getPassword() == null || dto.getPassword().trim().isEmpty()) {
-            dto.setPassword("PENDIENTE"); // ajusta si quieres obligatoria
+            dto.setPassword("PENDIENTE");
         }
 
         if (dto.getEmail() == null || dto.getEmail().trim().isEmpty() || !dto.getEmail().contains("@")) {
             throw new RuntimeException("Email obligatorio");
         }
 
-        // Normaliza y valida teléfono (solo números, sin espacios). Si viene vacío => null
+        // Normaliza y valida teléfono
+        dto.setTelefono(normalizarYValidarTelefono(dto.getTelefono()));
+
+        if (dto.getTipo_cliente() != null && !dto.getTipo_cliente().trim().isEmpty()) {
+            String tipo = dto.getTipo_cliente().trim().toUpperCase();
+            if (tipo.equals("PERSONA") || tipo.equals("PARTICULAR")) {
+                dto.setTipo_cliente("PARTICULAR");
+            } else if (tipo.equals("EMPRESA")) {
+                dto.setTipo_cliente("EMPRESA");
+            } else if (!tipo.equals("PARTICULAR") && !tipo.equals("EMPRESA")) {
+                throw new IllegalArgumentException(
+                        "Tipo de cliente inválido: " + dto.getTipo_cliente() +
+                                ". Valores válidos: PARTICULAR, EMPRESA"
+                );
+            } else {
+                dto.setTipo_cliente(tipo);
+            }
+        }
+    }
+
+    private void validarCamposActualizar(ClientesDTO dto) {
+        if (dto == null) throw new RuntimeException("DTO obligatorio");
+
+        if (dto.getNombre() == null || dto.getNombre().trim().isEmpty()) {
+            throw new RuntimeException("Nombre obligatorio");
+        }
+
+        // Password:si viene vacío, se mantiene la actual
+
+        if (dto.getEmail() == null || dto.getEmail().trim().isEmpty() || !dto.getEmail().contains("@")) {
+            throw new RuntimeException("Email obligatorio");
+        }
+
+        // Normaliza y valida teléfono.
         dto.setTelefono(normalizarYValidarTelefono(dto.getTelefono()));
 
         if (dto.getTipo_cliente() != null && !dto.getTipo_cliente().trim().isEmpty()) {

@@ -10,15 +10,36 @@
 <div class="container">
 
     <!-- Título -->
-    <h2>Consulta de clientes por empleado y fecha</h2>
+    <h2>Consulta de Clientes</h2>
 
     <!-- FORMULARIO DE BÚSQUEDA -->
     <form th:action="@{/consultas/clientes}" method="get">
 
         <div class="form-group m-bottom">
-            <label class="form-label">Empleado responsable</label>
-            <select name="idEmpleado" class="form-select" required>
-                <option value="">-- Seleccionar --</option>
+            <label class="form-label">Teléfono</label>
+            <input type="text" name="telefono" class="form-control" 
+                   placeholder="Buscar por teléfono" th:value="${telefono}">
+        </div>
+
+        <div class="form-group m-bottom">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" 
+                   placeholder="Buscar por email" th:value="${email}">
+        </div>
+
+        <div class="form-group m-bottom">
+            <label class="form-label">Tipo de Cliente</label>
+            <select name="tipoCliente" class="form-select">
+                <option value="">-- Todos --</option>
+                <option value="PARTICULAR" th:selected="${tipoCliente == 'PARTICULAR'}">PARTICULAR</option>
+                <option value="EMPRESA" th:selected="${tipoCliente == 'EMPRESA'}">EMPRESA</option>
+            </select>
+        </div>
+
+        <div class="form-group m-bottom">
+            <label class="form-label">Empleado Responsable</label>
+            <select name="idEmpleado" class="form-select">
+                <option value="">-- Todos --</option>
                 <option th:each="empleado : ${empleados}"
                         th:value="${empleado.id}"
                         th:text="${empleado.nombre}"
@@ -33,6 +54,7 @@
         </div>
 
         <button type="submit" class="btn btn-primary">Buscar</button>
+        <a th:href="@{/consultas/clientes}" class="btn btn-secondary">Limpiar</a>
     </form>
 
     <!-- RESULTADOS -->
@@ -46,17 +68,21 @@
                 <th>ID</th>
                 <th>Nombre</th>
                 <th>Email</th>
-                <th>Fecha alta</th>
-                <th>Empleado</th>
+                <th>Teléfono</th>
+                <th>Tipo Cliente</th>
+                <th>Fecha Alta</th>
+                <th>Empleado Responsable</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="cliente : ${clientes}">
                 <td th:text="${cliente.id}"></td>
                 <td th:text="${cliente.nombre}"></td>
-                <td th:text="${cliente.email}"></td>
-                <td th:text="${cliente.fechaAlta}"></td>
-                <td th:text="${cliente.idEmpleadoResponsable.nombre}"></td>
+                <td th:text="${cliente.email != null ? cliente.email : 'N/A'}"></td>
+                <td th:text="${cliente.telefono != null ? cliente.telefono : 'N/A'}"></td>
+                <td th:text="${cliente.tipoCliente != null ? cliente.tipoCliente : 'N/A'}"></td>
+                <td th:text="${cliente.fechaAlta != null ? #temporals.format(cliente.fechaAlta, 'dd/MM/yyyy') : 'N/A'}"></td>
+                <td th:text="${cliente.idEmpleadoResponsable != null ? cliente.idEmpleadoResponsable.nombre : 'Sin asignar'}"></td>
             </tr>
             </tbody>
         </table>

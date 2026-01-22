@@ -3,9 +3,12 @@ package org.springdataapi.springdemojpa.controller;
 import jakarta.validation.Valid;
 import org.springdataapi.springdemojpa.models.ClientesDTO;
 import org.springdataapi.springdemojpa.models.Clientes;
+import org.springdataapi.springdemojpa.security.CustomUserDetails;
 import org.springdataapi.springdemojpa.service.ClienteService;
 import org.springdataapi.springdemojpa.service.EmpleadosService;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -28,20 +31,48 @@ public class ClienteController {
     }
 
     @GetMapping
-    public String listar(Model model) {
+    public String listar(Authentication authentication, Model model) {
+        // Si es CLIENTE, redirige a su perfil
+        if (authentication != null && 
+            authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CLIENTE"))) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            return "redirect:/clientes/mi-perfil";
+        }
         model.addAttribute("clientes", clienteService.findAll());
         return "clientes/list";
     }
 
+    @GetMapping("/mi-perfil")
+    public String miPerfil(Authentication authentication, Model model) {
+        if (authentication == null || 
+            !authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CLIENTE"))) {
+            return "redirect:/clientes";
+        }
+        
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        Clientes cliente = clienteService.findById(userDetails.getUserId());
+        model.addAttribute("cliente", cliente);
+        return "clientes/perfil";
+    }
+
     @GetMapping("/nuevo")
-    public String nuevoCliente(Model model) {
+    public String nuevoCliente(Authentication authentication, Model model) {
+        // Solo ADMIN y EMPLEADO pueden crear clientes
+        if (authentication == null || 
+            authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CLIENTE"))) {
+            return "redirect:/clientes";
+        }
         model.addAttribute("clienteDTO", new ClientesDTO());
         model.addAttribute("empleados", empleadosService.findAll());
         return "clientes/form";
     }
 
     @GetMapping("/{id}/editar")
-    public String editarCliente(@PathVariable Integer id, Model model) {
+    public String editarCliente(@PathVariable Integer id, Authentication authentication, Model model) {
+        if (authentication != null &&
+            authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CLIENTE"))) {
+            return "redirect:/clientes/mi-perfil";
+        }
         Clientes cliente = clienteService.findById(id);
 
         ClientesDTO dto = new ClientesDTO();
@@ -50,7 +81,8 @@ public class ClienteController {
         dto.setEmail(cliente.getEmail());
         dto.setTelefono(cliente.getTelefono());
         dto.setTipo_cliente(cliente.getTipoCliente());
-        dto.setPassword(cliente.getPassword());
+        // NO establecer password para no exponerla
+        dto.setPassword(null);
         dto.setFecha_alta(cliente.getFechaAlta());
         if (cliente.getIdEmpleadoResponsable() != null) {
             dto.setId_empleadoresponsable(cliente.getIdEmpleadoResponsable().getId());
@@ -87,7 +119,12 @@ public class ClienteController {
     }
 
     @GetMapping("/{id}/eliminar")
-    public String eliminarCliente(@PathVariable Integer id, Model model) {
+    public String eliminarCliente(@PathVariable Integer id, Authentication authentication, Model model) {
+        // Solo ADMIN y EMPLEADO pueden eliminar
+        if (authentication == null || 
+            authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CLIENTE"))) {
+            return "redirect:/clientes";
+        }
         try {
             clienteService.eliminar(id);
         } catch (RuntimeException e) {

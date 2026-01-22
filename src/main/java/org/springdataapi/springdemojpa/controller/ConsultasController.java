@@ -46,19 +46,42 @@ public class ConsultasController
 
     @GetMapping("/consultas/clientes")
     public String consultarClientes(
+            @RequestParam(name = "telefono", required = false) String telefono,
+            @RequestParam(name = "email", required = false) String email,
+            @RequestParam(name = "tipoCliente", required = false) String tipoCliente,
             @RequestParam(name = "idEmpleado", required = false) Integer idEmpleado,
             @RequestParam(name = "fechaDesde", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaDesde,
             Model model) {
 
         model.addAttribute("empleados", empleadosService.findAll());
 
-        if (idEmpleado != null && fechaDesde != null) {
-            List<Clientes> clientes = clienteService.BuscarClientePorEmpleadoyFecha(idEmpleado,fechaDesde);
+        // Normalizar parámetros
+        String telefonoNormalizado = (telefono != null && !telefono.trim().isEmpty()) ? telefono.trim() : null;
+        String emailNormalizado = (email != null && !email.trim().isEmpty()) ? email.trim() : null;
+        String tipoClienteNormalizado = (tipoCliente != null && !tipoCliente.trim().isEmpty()) ? tipoCliente.trim() : null;
+
+        // Verificar si hay algún filtro activo
+        boolean hayFiltros = telefonoNormalizado != null ||
+                            emailNormalizado != null ||
+                            tipoClienteNormalizado != null ||
+                            idEmpleado != null ||
+                            fechaDesde != null;
+
+        if (hayFiltros) {
+            List<Clientes> clientes = clienteService.buscarClientesFiltrados(
+                    telefonoNormalizado, emailNormalizado, tipoClienteNormalizado, idEmpleado, fechaDesde);
             model.addAttribute("clientes", clientes);
-            model.addAttribute("idEmpleado", idEmpleado);
-            model.addAttribute("fechaDesde", fechaDesde);
+        } else {
+            // Si no hay filtros, no mostrar resultados
+            model.addAttribute("clientes", null);
         }
 
+        // Mantener valores en el formulario
+        model.addAttribute("telefono", telefono);
+        model.addAttribute("email", email);
+        model.addAttribute("tipoCliente", tipoCliente);
+        model.addAttribute("idEmpleado", idEmpleado);
+        model.addAttribute("fechaDesde", fechaDesde);
 
         return "consultas/clientes";
     }

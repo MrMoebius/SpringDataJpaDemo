@@ -14,8 +14,8 @@
         </div>
 
         <div class="d-flex j-c-between a-i-center m-bottom">
-            <h1>Listado de Productos</h1>
-            <a th:href="@{/productos/nuevo}" class="btn btn-success">Nuevo Producto</a>
+            <h1 th:text="${soloLectura != null && soloLectura ? 'Productos Disponibles' : 'Listado de Productos'}"></h1>
+            <a th:if="${soloLectura == null || !soloLectura}" th:href="@{/productos/nuevo}" class="btn btn-success">Nuevo Producto</a>
         </div>
 
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
@@ -38,11 +38,14 @@
                     <td th:text="${p.categoria}"></td>
                     <td th:text="${p.precio != null ? #numbers.formatDecimal(p.precio, 1, 2) : 'N/A'}"></td>
                     <td th:text="${p.activo} ? 'Sí' : 'No'"></td>
-                    <td>
+                    <td th:if="${soloLectura == null || !soloLectura}">
                         <a th:href="@{|/productos/editar/${p.id}|}" class="btn btn-sm btn-warning">Editar</a>
                         <a th:href="@{|/productos/eliminar/${p.id}|}"
                            class="btn btn-sm btn-danger"
                            onclick="return confirm('¿Eliminar producto?');">Eliminar</a>
+                    </td>
+                    <td th:if="${soloLectura != null && soloLectura}">
+                        <span style="color: #b0b0b0;">Solo lectura</span>
                     </td>
                 </tr>
             </tbody>

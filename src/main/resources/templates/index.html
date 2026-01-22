@@ -11,26 +11,54 @@
         <h1>Bienvenido al Sistema CRM</h1>
         
         <div class="menu-container">
-            <div class="menu-item">
+            <!-- Opciones para ADMIN: Todo -->
+            <div th:if="${isAdmin}" class="menu-item">
                 <a th:href="@{/clientes}">Gestión de Clientes</a>
                 <p>Administrar clientes</p>
             </div>
             
-            <div class="menu-item">
+            <div th:if="${isAdmin}" class="menu-item">
                 <a th:href="@{/empleados}">Gestión de Empleados</a>
                 <p>Administrar empleados</p>
             </div>
             
-            <div class="menu-item">
+            <div th:if="${isAdmin}" class="menu-item">
                 <a th:href="@{/productos}">Gestión de Productos</a>
                 <p>Administrar el catálogo de productos</p>
             </div>
-            <div class="menu-item">
+            
+            <div th:if="${isAdmin}" class="menu-item">
                 <a th:href="@{/consultas}">Querys</a>
                 <p>Administrar las consultas</p>
             </div>
+
+            <!-- Opciones para EMPLEADO: Clientes, Productos y Querys -->
+            <div th:if="${isEmpleado}" class="menu-item">
+                <a th:href="@{/clientes}">Gestión de Clientes</a>
+                <p>Administrar clientes</p>
+            </div>
+            
+            <div th:if="${isEmpleado}" class="menu-item">
+                <a th:href="@{/productos}">Gestión de Productos</a>
+                <p>Administrar el catálogo de productos</p>
+            </div>
+            
+            <div th:if="${isEmpleado}" class="menu-item">
+                <a th:href="@{/consultas}">Querys</a>
+                <p>Administrar las consultas</p>
+            </div>
+
+            <!-- Opciones para CLIENTE: Solo ver su información y productos disponibles -->
+            <div th:if="${isCliente}" class="menu-item">
+                <a th:href="@{/clientes/mi-perfil}">Mi Perfil</a>
+                <p>Ver mi información de cliente</p>
+            </div>
+            
+            <div th:if="${isCliente}" class="menu-item">
+                <a th:href="@{/productos}">Productos Disponibles</a>
+                <p>Ver productos disponibles</p>
+            </div>
         </div>
-    </div>
 
         <footer class="footer">
             <span class="footer-title">Sistema CRM</span>
