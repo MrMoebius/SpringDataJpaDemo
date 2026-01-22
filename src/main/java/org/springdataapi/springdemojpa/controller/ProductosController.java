@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/productos")
@@ -60,15 +61,19 @@ public class ProductosController {
     public String guardar(
             @Valid @ModelAttribute("productosDTO") ProductosDTO dto,
             BindingResult br,
-            Model model) {
+            Model model,
+            RedirectAttributes redirectAttributes) {
         if (br.hasErrors())
             return "productos/form";
 
         try {
-            if (dto.getId() == null)
+            if (dto.getId() == null) {
                 productosService.crear(dto);
-            else
+                redirectAttributes.addFlashAttribute("success", "Producto añadido correctamente");
+            } else {
                 productosService.actualizar(dto.getId(), dto);
+                redirectAttributes.addFlashAttribute("success", "Producto modificado correctamente");
+            }
             return "redirect:/productos";
         } catch (RuntimeException ex) {
             model.addAttribute("error", ex.getMessage());
@@ -77,7 +82,7 @@ public class ProductosController {
     }
 
     @GetMapping("/eliminar/{id}")
-    public String eliminar(@PathVariable Integer id, Authentication authentication, Model model) {
+    public String eliminar(@PathVariable Integer id, Authentication authentication, Model model, RedirectAttributes redirectAttributes) {
         // Solo ADMIN y EMPLEADO pueden eliminar
         if (authentication == null || 
             authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CLIENTE"))) {
@@ -85,6 +90,7 @@ public class ProductosController {
         }
         try {
             productosService.eliminar(id);
+            redirectAttributes.addFlashAttribute("success", "Producto eliminado correctamente");
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("productos", productosService.findAll());

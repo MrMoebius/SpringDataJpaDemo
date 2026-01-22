@@ -92,7 +92,11 @@ public class EmpleadosService {
         if (!empleadosRepository.existsById(id)) {
             throw new RuntimeException("Empleado no existe");
         }
-        empleadosRepository.deleteById(id);
+        try {
+            empleadosRepository.deleteById(id);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new RuntimeException("No se puede eliminar el empleado porque tiene registros relacionados (clientes asignados, facturas, etc.)");
+        }
     }
 
     public Empleados actualizar(Integer id, EmpleadosDTO dto) {
@@ -145,6 +149,13 @@ public class EmpleadosService {
         return empleadosRepository.buscarPorLetra(letra);
     }
 
+    public List<Empleados> buscarEmpleadosFiltrados(
+            String telefono, String email, String estado, 
+            Integer idRol, Boolean tieneClientes, LocalDate fechaIngreso) {
+        return empleadosRepository.buscarEmpleadosFiltrados(
+                telefono, email, estado, idRol, tieneClientes, fechaIngreso);
+    }
+
     private void validarCamposCrear(EmpleadosDTO dto) {
         if (dto == null) throw new RuntimeException("DTO obligatorio");
 
@@ -192,10 +203,6 @@ public class EmpleadosService {
         };
     }
 
-    /**
-     * Devuelve null si viene vacío. Si viene informado, exige SOLO dígitos.
-     * Además elimina espacios internos ("600 123 123" -> "600123123").
-     */
     private String normalizarYValidarTelefono(String telefono) {
         if (telefono == null) return null;
 

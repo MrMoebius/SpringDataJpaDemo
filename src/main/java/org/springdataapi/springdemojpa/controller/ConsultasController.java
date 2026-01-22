@@ -88,45 +88,92 @@ public class ConsultasController
 
     @GetMapping("/consultas/productos")
     public String consultarProductos(
+            @RequestParam(name = "nombre", required = false) String nombre,
             @RequestParam(name = "categoria", required = false) String categoria,
             @RequestParam(name = "precioMin", required = false) Double precioMin,
+            @RequestParam(name = "precioMax", required = false) Double precioMax,
+            @RequestParam(name = "activo", required = false) String activo,
             Model model) {
 
-        try {
-            List<Productos> productos;
-
-            if ((categoria != null && !categoria.isEmpty()) || (precioMin != null && precioMin > 0)) {
-                productos = productosService.BuscarProductosFiltrados(
-                        categoria != null ? categoria : "",
-                        precioMin != null ? precioMin : 0
-                );
-            } else {
-                productos = productosService.findAll();
-            }
-
-            model.addAttribute("productos", productos);
-
-            if (productos.isEmpty()) {
-                model.addAttribute("mensaje", "No se encontraron productos con los filtros aplicados.");
-            }
-
-        } catch (Exception e) {
-            model.addAttribute("mensaje", "Ocurrió un error al consultar los productos: " + e.getMessage());
+        // Normalizar parámetros
+        String nombreNormalizado = (nombre != null && !nombre.trim().isEmpty()) ? nombre.trim() : null;
+        String categoriaNormalizada = (categoria != null && !categoria.trim().isEmpty()) ? categoria.trim() : null;
+        Boolean activoBool = null;
+        if (activo != null && !activo.trim().isEmpty()) {
+            activoBool = Boolean.parseBoolean(activo);
         }
+
+        // Verificar si hay algún filtro activo
+        boolean hayFiltros = nombreNormalizado != null ||
+                            categoriaNormalizada != null ||
+                            precioMin != null ||
+                            precioMax != null ||
+                            activoBool != null;
+
+        if (hayFiltros) {
+            List<Productos> productos = productosService.buscarProductosFiltrados(
+                    nombreNormalizado, categoriaNormalizada, precioMin, precioMax, activoBool);
+            model.addAttribute("productos", productos);
+        } else {
+            model.addAttribute("productos", null);
+        }
+
+        // Mantener valores en el formulario
+        model.addAttribute("nombre", nombre);
+        model.addAttribute("categoria", categoria);
+        model.addAttribute("precioMin", precioMin);
+        model.addAttribute("precioMax", precioMax);
+        model.addAttribute("activo", activo);
 
         return "consultas/productos";
     }
 
     @GetMapping("/consultas/empleados")
-    public String listarEmpleados(@RequestParam(value = "letra", required = false) String letra, Model model) {
-        List<Empleados> empleados;
-        if (letra != null && !letra.isEmpty()) {
-            empleados = empleadosService.BuscarPorLetras(letra);
-        } else {
-            empleados = empleadosService.findAll();
+    public String listarEmpleados(
+            @RequestParam(name = "telefono", required = false) String telefono,
+            @RequestParam(name = "email", required = false) String email,
+            @RequestParam(name = "estado", required = false) String estado,
+            @RequestParam(name = "idRol", required = false) Integer idRol,
+            @RequestParam(name = "tieneClientes", required = false) String tieneClientes,
+            @RequestParam(name = "fechaIngreso", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaIngreso,
+            Model model) {
+
+        model.addAttribute("roles", rolesEmpleadoService.findAll());
+
+        // Normalizar parámetros
+        String telefonoNormalizado = (telefono != null && !telefono.trim().isEmpty()) ? telefono.trim() : null;
+        String emailNormalizado = (email != null && !email.trim().isEmpty()) ? email.trim() : null;
+        String estadoNormalizado = (estado != null && !estado.trim().isEmpty()) ? estado.trim() : null;
+        Boolean tieneClientesBool = null;
+        if (tieneClientes != null && !tieneClientes.trim().isEmpty()) {
+            tieneClientesBool = Boolean.parseBoolean(tieneClientes);
         }
-        model.addAttribute("empleados", empleados);
-        model.addAttribute("letra", letra != null ? letra : "");
+
+        // Verificar si hay algún filtro activo
+        boolean hayFiltros = telefonoNormalizado != null ||
+                            emailNormalizado != null ||
+                            estadoNormalizado != null ||
+                            idRol != null ||
+                            tieneClientesBool != null ||
+                            fechaIngreso != null;
+
+        if (hayFiltros) {
+            List<Empleados> empleados = empleadosService.buscarEmpleadosFiltrados(
+                    telefonoNormalizado, emailNormalizado, estadoNormalizado, 
+                    idRol, tieneClientesBool, fechaIngreso);
+            model.addAttribute("empleados", empleados);
+        } else {
+            model.addAttribute("empleados", null);
+        }
+
+        // Mantener valores en el formulario
+        model.addAttribute("telefono", telefono);
+        model.addAttribute("email", email);
+        model.addAttribute("estado", estado);
+        model.addAttribute("idRol", idRol);
+        model.addAttribute("tieneClientes", tieneClientes);
+        model.addAttribute("fechaIngreso", fechaIngreso);
+
         return "consultas/empleados";
     }
 

@@ -7,58 +7,94 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
+
 <div class="container">
-    <h1>Consulta de Productos</h1>
 
+    <!-- Título -->
+    <h2>Consulta de Productos</h2>
+
+    <!-- FORMULARIO DE BÚSQUEDA -->
     <form th:action="@{/consultas/productos}" method="get">
-        <div class="form-group">
-            <label class="form-label" for="categoria">Categoría:</label>
-            <select class="form-select" id="categoria" name="categoria"><option value="Ciclo Formativo" th:selected="${param.categoria == 'Ciclo Formativo'}">Ciclo Formativo</option>
-                <option value="Formación Complementaria" th:selected="${param.categoria == 'Formación Complementaria'}">Formación Complementaria</option>
 
+        <div class="form-group m-bottom">
+            <label class="form-label">Nombre</label>
+            <input type="text" name="nombre" class="form-control" 
+                   placeholder="Buscar por nombre" th:value="${nombre}">
+        </div>
+
+        <div class="form-group m-bottom">
+            <label class="form-label">Categoría</label>
+            <select name="categoria" class="form-select">
+                <option value="">-- Todas --</option>
+                <option value="CICLO FORMATIVO" th:selected="${categoria == 'CICLO FORMATIVO'}">CICLO FORMATIVO</option>
+                <option value="FORMACION COMPLEMENTARIA" th:selected="${categoria == 'FORMACION COMPLEMENTARIA'}">FORMACION COMPLEMENTARIA</option>
             </select>
         </div>
 
-        <div class="form-group">
-            <label class="form-label" for="precioMin">Precio mínimo:</label>
-            <input class="form-control" type="number" id="precioMin" name="precioMin"
-                   th:value="${precioMinSeleccionado}" placeholder="Ej. 100">
+        <div class="form-group m-bottom">
+            <label class="form-label">Precio Mínimo</label>
+            <input type="number" name="precioMin" class="form-control" 
+                   placeholder="Precio mínimo" step="0.01" min="0" th:value="${precioMin}">
         </div>
 
-        <button class="btn btn-primary" type="submit">Filtrar</button>
+        <div class="form-group m-bottom">
+            <label class="form-label">Precio Máximo</label>
+            <input type="number" name="precioMax" class="form-control" 
+                   placeholder="Precio máximo" step="0.01" min="0" th:value="${precioMax}">
+        </div>
+
+        <div class="form-group m-bottom">
+            <label class="form-label">Activo</label>
+            <select name="activo" class="form-select">
+                <option value="">-- Todos --</option>
+                <option value="true" th:selected="${activo == 'true'}">Sí</option>
+                <option value="false" th:selected="${activo == 'false'}">No</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Buscar</button>
+        <a th:href="@{/consultas/productos}" class="btn btn-secondary">Limpiar</a>
     </form>
 
-    <hr>
+    <!-- RESULTADOS -->
+    <div th:if="${productos != null}" class="m-top">
 
-    <div th:if="${mensaje}" class="alert alert-danger" th:text="${mensaje}"></div>
+        <h3>Resultados</h3>
 
-    <!-- Tabla de resultados -->
-    <table th:if="${productos}" class="m-top">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Descripción</th>
-            <th>Categoría</th>
-            <th>Precio</th>
-            <th>Activo</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="producto : ${productos}">
-            <td th:text="${producto.id}"></td>
-            <td th:text="${producto.nombre}"></td>
-            <td th:text="${producto.descripcion}"></td>
-            <td th:text="${producto.categoria}"></td>
-            <td th:text="${#numbers.formatDecimal(producto.precio, 1, 'COMMA', 2, 'POINT')}"></td>
-            <td th:text="${producto.activo} ? 'Sí' : 'No'"></td>
-        </tr>
-        </tbody>
-    </table>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Categoría</th>
+                <th>Precio</th>
+                <th>Activo</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="producto : ${productos}">
+                <td th:text="${producto.id}"></td>
+                <td th:text="${producto.nombre}"></td>
+                <td th:text="${producto.descripcion != null ? producto.descripcion : 'N/A'}"></td>
+                <td th:text="${producto.categoria != null ? producto.categoria : 'N/A'}"></td>
+                <td th:text="${producto.precio != null ? #numbers.formatDecimal(producto.precio, 1, 2) : 'N/A'}"></td>
+                <td th:text="${producto.activo != null && producto.activo ? 'Sí' : 'No'}"></td>
+            </tr>
+            </tbody>
+        </table>
 
-    <div th:if="${productos != null} and ${productos.isEmpty()}" class="alert alert-info m-top">
-        No se encontraron productos con los filtros aplicados.
+        <p th:if="${#lists.isEmpty(productos)}" class="m-top text-center">
+            No se encontraron productos
+        </p>
     </div>
+
+    <!-- VOLVER -->
+    <div class="m-top text-center">
+        <a th:href="@{/}" class="btn btn-secondary">Volver al menú</a>
+    </div>
+
 </div>
+
 </body>
 </html>

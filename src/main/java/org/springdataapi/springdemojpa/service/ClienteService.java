@@ -90,7 +90,11 @@ public class ClienteService {
         if (!clientesRepository.existsById(id)) {
             throw new RuntimeException("Cliente no existe");
         }
-        clientesRepository.deleteById(id);
+        try {
+            clientesRepository.deleteById(id);
+        } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            throw new RuntimeException("No se puede eliminar el cliente porque tiene registros relacionados (facturas, presupuestos, etc.)");
+        }
     }
 
     public Clientes actualizar(Integer id, ClientesDTO dto) {
