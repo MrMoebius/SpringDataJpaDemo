@@ -5,7 +5,7 @@ import org.springdataapi.springdemojpa.models.EmpleadosDTO;
 import org.springdataapi.springdemojpa.models.RolesEmpleado;
 import org.springdataapi.springdemojpa.repository.EmpleadosRepository;
 import org.springdataapi.springdemojpa.repository.RolesEmpleadoRepository;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -41,7 +41,7 @@ public class EmpleadosService {
     }
 
     public Optional<Empleados> findByTelefono(String telefono) {
-        String tel = normalizarYValidarTelefono(telefono);
+        String tel = normalizarYValidarTelefono(telefono); // ✅ solo números
         if (tel == null) throw new RuntimeException("Teléfono obligatorio");
         return Optional.ofNullable(empleadosRepository.findByTelefono(tel)
                 .orElseThrow(() -> new RuntimeException("Empleado no encontrado por teléfono")));
@@ -77,7 +77,7 @@ public class EmpleadosService {
         e.setNombre(dto.getNombre().trim());
         e.setEmail(dto.getEmail().trim());
         e.setTelefono(telefonoNormalizado);
-        e.setPassword(dto.getPassword());
+        e.setPassword(dto.getPassword()); // aquí no has pedido hash
         e.setIdRol(rol);
 
         e.setFechaIngreso(dto.getFechaIngreso() != null ? dto.getFechaIngreso() : LocalDate.now());
@@ -92,11 +92,7 @@ public class EmpleadosService {
         if (!empleadosRepository.existsById(id)) {
             throw new RuntimeException("Empleado no existe");
         }
-        try {
-            empleadosRepository.deleteById(id);
-        } catch (DataIntegrityViolationException e) {
-            throw new RuntimeException("No se puede eliminar el empleado porque tiene registros relacionados (clientes asignados, facturas, etc.)");
-        }
+        empleadosRepository.deleteById(id);
     }
 
     public Empleados actualizar(Integer id, EmpleadosDTO dto) {
@@ -134,6 +130,7 @@ public class EmpleadosService {
             e.setPassword(dto.getPassword());
         }
 
+
         if (dto.getIdRol() != null) {
             RolesEmpleado rol = rolesEmpleadoRepository.findById(dto.getIdRol())
                     .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
@@ -141,6 +138,11 @@ public class EmpleadosService {
         }
 
         return empleadosRepository.save(e);
+    }
+
+    public List<Empleados> BuscarPorLetras(String letra)
+    {
+        return empleadosRepository.buscarPorLetra(letra);
     }
 
     private void validarCamposCrear(EmpleadosDTO dto) {
@@ -153,7 +155,7 @@ public class EmpleadosService {
             throw new RuntimeException("Email obligatorio");
         }
         if (dto.getPassword() == null || dto.getPassword().isBlank()) {
-            throw new RuntimeException("Ponle contraseña subnormal");
+            throw new RuntimeException("Password obligatorio");
         }
         if (dto.getIdRol() == null) {
             throw new RuntimeException("Rol obligatorio");
@@ -169,10 +171,11 @@ public class EmpleadosService {
         if (dto.getEmail() == null || dto.getEmail().isBlank()) {
             throw new RuntimeException("Email obligatorio");
         }
+        // password / rol / fechaIngreso / estado: opcionales en update
     }
 
     /**
-     * Normaliza el estado para soportar un <select> "Sí/No"
+     * ✅ Normaliza el estado para soportar un <select> "Sí/No"
      * - null o vacío => "activo"
      * - "si"/"sí"/"true"/"1"/"activo" => "activo"
      * - "no"/"false"/"0"/"inactivo" => "inactivo"
@@ -202,7 +205,7 @@ public class EmpleadosService {
         t = t.replaceAll("\\s+", ""); // esto quita espacios
 
         if (t.length() > 9) {
-            throw new IllegalArgumentException("Pero que número es ese subnormal, pon uno de verdad");
+            throw new IllegalArgumentException("Pero que número es ese subnormal");
         }
 
         if (!t.matches("\\d+")) {
