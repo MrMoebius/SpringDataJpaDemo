@@ -58,12 +58,14 @@ public class ClienteService {
         validarCampos(dto);
 
         String email = dto.getEmail().trim();
-        String telefono = normalizarYValidarTelefono(dto.getTelefono());
+
+        String telefono = dto.getTelefono();
 
         if (clientesRepository.existsByEmail(email)) {
             throw new RuntimeException("Email ya registrado");
         }
-        if (telefono != null && clientesRepository.existsByTelefono(telefono)) {
+
+        if (clientesRepository.existsByTelefono(telefono)) {
             throw new RuntimeException("Teléfono ya registrado");
         }
 
@@ -137,13 +139,12 @@ public class ClienteService {
         return clientesRepository.save(cliente);
     }
 
-    public List<Clientes> BuscarClientePorEmpleadoyFecha(Integer idEmpleado, LocalDate  fechaDesde)
-    {
-        return  clientesRepository.BusacarClientePorEmpleadoyFecha(idEmpleado, fechaDesde);
+    public List<Clientes> BuscarClientePorEmpleadoyFecha(Integer idEmpleado, LocalDate fechaDesde) {
+        return clientesRepository.BusacarClientePorEmpleadoyFecha(idEmpleado, fechaDesde);
     }
 
     public List<Clientes> buscarClientesFiltrados(
-            String telefono, String email, String tipoCliente, 
+            String telefono, String email, String tipoCliente,
             Integer idEmpleado, LocalDate fechaDesde) {
         return clientesRepository.buscarClientesFiltrados(
                 telefono, email, tipoCliente, idEmpleado, fechaDesde);
@@ -157,15 +158,18 @@ public class ClienteService {
         }
 
         if (dto.getPassword() == null || dto.getPassword().trim().isEmpty()) {
-            dto.setPassword("PENDIENTE");
+            throw new RuntimeException("Password obligatorio");
         }
 
         if (dto.getEmail() == null || dto.getEmail().trim().isEmpty() || !dto.getEmail().contains("@")) {
             throw new RuntimeException("Email obligatorio");
         }
 
-        // Normaliza y valida teléfono
-        dto.setTelefono(normalizarYValidarTelefono(dto.getTelefono()));
+        String tel = normalizarYValidarTelefono(dto.getTelefono());
+        if (tel == null) {
+            throw new RuntimeException("Teléfono obligatorio");
+        }
+        dto.setTelefono(tel);
 
         if (dto.getTipo_cliente() != null && !dto.getTipo_cliente().trim().isEmpty()) {
             String tipo = dto.getTipo_cliente().trim().toUpperCase();
@@ -191,13 +195,13 @@ public class ClienteService {
             throw new RuntimeException("Nombre obligatorio");
         }
 
-        // Password:si viene vacío, se mantiene la actual
+        // Password: si viene vacío, se mantiene la actual
 
         if (dto.getEmail() == null || dto.getEmail().trim().isEmpty() || !dto.getEmail().contains("@")) {
             throw new RuntimeException("Email obligatorio");
         }
 
-        // Normaliza y valida teléfono.
+        // Normaliza y valida teléfono (en UPDATE puede ser null)
         dto.setTelefono(normalizarYValidarTelefono(dto.getTelefono()));
 
         if (dto.getTipo_cliente() != null && !dto.getTipo_cliente().trim().isEmpty()) {
@@ -229,12 +233,12 @@ public class ClienteService {
 
         t = t.replaceAll("\\s+", ""); // esto quita espacios
 
-        if (t.length() > 9) {
-            throw new IllegalArgumentException("El teléfono supera la longitud máxima permitida.");
-        }
-
         if (!t.matches("\\d+")) {
             throw new RuntimeException("El teléfono solo puede contener números (0-9)");
+        }
+
+        if (t.length() != 9) {
+            throw new IllegalArgumentException("El teléfono debe tener exactamente 9 dígitos.");
         }
 
         return t;
