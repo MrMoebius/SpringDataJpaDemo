@@ -5,7 +5,6 @@ import org.springdataapi.springdemojpa.models.EmpleadosDTO;
 import org.springdataapi.springdemojpa.models.RolesEmpleado;
 import org.springdataapi.springdemojpa.repository.EmpleadosRepository;
 import org.springdataapi.springdemojpa.repository.RolesEmpleadoRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;

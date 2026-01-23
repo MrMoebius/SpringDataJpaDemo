@@ -3,7 +3,6 @@ package org.springdataapi.springdemojpa.controller;
 import org.springdataapi.springdemojpa.models.Clientes;
 import org.springdataapi.springdemojpa.models.Empleados;
 import org.springdataapi.springdemojpa.models.Productos;
-import org.springdataapi.springdemojpa.repository.EmpleadosRepository;
 import org.springdataapi.springdemojpa.service.ClienteService;
 import org.springdataapi.springdemojpa.service.EmpleadosService;
 import org.springdataapi.springdemojpa.service.ProductosService;
@@ -12,7 +11,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
