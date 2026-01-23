@@ -82,7 +82,7 @@ public class ProductosService {
         }
 
         if (dto.getPrecio() != null && dto.getPrecio() < 0) {
-            throw new RuntimeException("El precio no puede ser negativo");
+            throw new RuntimeException("¿Lo de que pienses que le puedes poner un precio negativo a un producto, qué es?");
         }
 
         p.setNombre(nuevoNombre);

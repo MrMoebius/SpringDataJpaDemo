@@ -158,7 +158,7 @@ public class ClienteService {
         }
 
         if (dto.getPassword() == null || dto.getPassword().trim().isEmpty()) {
-            throw new RuntimeException("Password obligatorio");
+            throw new RuntimeException("La password pa otro día ¿no?");
         }
 
         if (dto.getEmail() == null || dto.getEmail().trim().isEmpty() || !dto.getEmail().contains("@")) {
@@ -167,7 +167,7 @@ public class ClienteService {
 
         String tel = normalizarYValidarTelefono(dto.getTelefono());
         if (tel == null) {
-            throw new RuntimeException("Teléfono obligatorio");
+            throw new RuntimeException("¿Y tú teléfono olvidona?");
         }
         dto.setTelefono(tel);
 
@@ -238,7 +238,7 @@ public class ClienteService {
         }
 
         if (t.length() != 9) {
-            throw new IllegalArgumentException("El teléfono debe tener exactamente 9 dígitos.");
+            throw new IllegalArgumentException("Pero que numero es ese payaso, ponme uno de verdad");
         }
 
         return t;
