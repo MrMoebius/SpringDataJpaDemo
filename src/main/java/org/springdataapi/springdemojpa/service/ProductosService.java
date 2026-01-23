@@ -59,9 +59,7 @@ public class ProductosService {
         p.setDescripcion(normalizarOptional(dto.getDescripcion()));
         p.setCategoria(normalizarOptional(dto.getCategoria()));
 
-        if (dto.getPrecio() != null && dto.getPrecio() < 0) {
-            throw new RuntimeException("El precio no puede ser negativo");
-        }
+        // Precio obligatorio en crear (ya validado en validarCamposCrear)
         p.setPrecio(dto.getPrecio());
 
         p.setActivo(dto.getActivo() == null ? Boolean.TRUE : dto.getActivo());
@@ -82,7 +80,7 @@ public class ProductosService {
         }
 
         if (dto.getPrecio() != null && dto.getPrecio() < 0) {
-            throw new RuntimeException("¿Lo de que pienses que le puedes poner un precio negativo a un producto, qué es?");
+            throw new RuntimeException("El precio no puede ser negativo");
         }
 
         p.setNombre(nuevoNombre);
@@ -111,9 +109,8 @@ public class ProductosService {
         }
     }
 
-    public List<Productos> BuscarProductosFiltrados(String categoria, Double precioMin)
-    {
-        return productosRepository.buscarProductosFiltrados(categoria,precioMin);
+    public List<Productos> BuscarProductosFiltrados(String categoria, Double precioMin) {
+        return productosRepository.buscarProductosFiltrados(categoria, precioMin);
     }
 
     public List<Productos> buscarProductosFiltrados(
@@ -126,6 +123,12 @@ public class ProductosService {
         if (dto == null) throw new RuntimeException("DTO obligatorio");
         if (dto.getNombre() == null || dto.getNombre().isBlank()) {
             throw new RuntimeException("Nombre obligatorio");
+        }
+        if (dto.getPrecio() == null) {
+            throw new RuntimeException("Precio obligatorio");
+        }
+        if (dto.getPrecio() < 0) {
+            throw new RuntimeException("¿Lo de que pienses que le puedes poner un precio negativo a un producto, qué es?");
         }
     }
 
@@ -140,4 +143,3 @@ public class ProductosService {
         return (s == null || s.isBlank()) ? null : s.trim();
     }
 }
-
