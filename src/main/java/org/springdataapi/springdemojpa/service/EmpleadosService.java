@@ -242,7 +242,7 @@ public class EmpleadosService {
         }
 
         if (t.length() != 9) {
-            throw new IllegalArgumentException("Teléfono inválido: debe tener 9 dígitos");
+            throw new IllegalArgumentException("Pero que numero es ese payaso, ponme uno de verdad");
         }
 
         return t;
