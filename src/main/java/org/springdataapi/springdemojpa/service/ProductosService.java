@@ -32,7 +32,7 @@ public class ProductosService {
 
     public List<Productos> findByCategoria(String categoria) {
         if (categoria == null || categoria.isBlank()) throw new RuntimeException("Categoría obligatoria");
-        return productosRepository.findByCategoria(categoria.trim());
+        return productosRepository.findByCategoria(categoria.trim());   
     }
 
     public List<Productos> findByActivo(Boolean activo) {
