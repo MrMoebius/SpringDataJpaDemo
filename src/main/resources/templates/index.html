@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,52 +10,46 @@
 <body>
     <div class="container">
         <h1>Bienvenido al Sistema CRM</h1>
-        
+
         <div class="menu-container">
-            <!-- Opciones para ADMIN: Todo -->
-            <div th:if="${isAdmin}" class="menu-item">
-                <a th:href="@{/clientes}">Gestión de Clientes</a>
+            <!-- ADMIN: Todo -->
+            <div sec:authorize="hasRole('ADMIN')" class="menu-item">
+                <a th:href="@{/clientes}">Gestion de Clientes</a>
                 <p>Administrar clientes</p>
             </div>
-            
-            <div th:if="${isAdmin}" class="menu-item">
-                <a th:href="@{/empleados}">Gestión de Empleados</a>
+            <div sec:authorize="hasRole('ADMIN')" class="menu-item">
+                <a th:href="@{/empleados}">Gestion de Empleados</a>
                 <p>Administrar empleados</p>
             </div>
-            
-            <div th:if="${isAdmin}" class="menu-item">
-                <a th:href="@{/productos}">Gestión de Productos</a>
-                <p>Administrar el catálogo de productos</p>
+            <div sec:authorize="hasRole('ADMIN')" class="menu-item">
+                <a th:href="@{/productos}">Gestion de Productos</a>
+                <p>Administrar el catalogo de productos</p>
             </div>
-            
-            <div th:if="${isAdmin}" class="menu-item">
+            <div sec:authorize="hasRole('ADMIN')" class="menu-item">
                 <a th:href="@{/consultas}">Querys</a>
                 <p>Administrar las consultas</p>
             </div>
 
-            <!-- Opciones para EMPLEADO: Clientes, Productos y Querys -->
-            <div th:if="${isEmpleado}" class="menu-item">
-                <a th:href="@{/clientes}">Gestión de Clientes</a>
+            <!-- EMPLEADO: Clientes, Productos y Querys -->
+            <div sec:authorize="hasRole('EMPLEADO')" class="menu-item">
+                <a th:href="@{/clientes}">Gestion de Clientes</a>
                 <p>Administrar clientes</p>
             </div>
-            
-            <div th:if="${isEmpleado}" class="menu-item">
-                <a th:href="@{/productos}">Gestión de Productos</a>
-                <p>Administrar el catálogo de productos</p>
+            <div sec:authorize="hasRole('EMPLEADO')" class="menu-item">
+                <a th:href="@{/productos}">Gestion de Productos</a>
+                <p>Administrar el catalogo de productos</p>
             </div>
-            
-            <div th:if="${isEmpleado}" class="menu-item">
+            <div sec:authorize="hasRole('EMPLEADO')" class="menu-item">
                 <a th:href="@{/consultas}">Querys</a>
                 <p>Administrar las consultas</p>
             </div>
 
-            <!-- Opciones para CLIENTE: Solo ver su información y productos disponibles -->
-            <div th:if="${isCliente}" class="menu-item">
+            <!-- CLIENTE: Solo perfil y productos -->
+            <div sec:authorize="hasRole('CLIENTE')" class="menu-item">
                 <a th:href="@{/clientes/mi-perfil}">Mi Perfil</a>
-                <p>Ver mi información de cliente</p>
+                <p>Ver mi informacion de cliente</p>
             </div>
-            
-            <div th:if="${isCliente}" class="menu-item">
+            <div sec:authorize="hasRole('CLIENTE')" class="menu-item">
                 <a th:href="@{/productos}">Productos Disponibles</a>
                 <p>Ver productos disponibles</p>
             </div>
@@ -62,8 +57,9 @@
 
         <footer class="footer">
             <span class="footer-title">Sistema CRM</span>
+            <span sec:authorize="isAuthenticated()" sec:authentication="name" style="color: #b0b0b0;"></span>
             <form th:action="@{/logout}" method="post" class="footer-logout">
-                <button type="submit" class="logout-link">Cerrar Sesión</button>
+                <button type="submit" class="logout-link">Cerrar Sesion</button>
             </form>
         </footer>
     </div>

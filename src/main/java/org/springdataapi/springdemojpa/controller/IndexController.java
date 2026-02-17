@@ -12,13 +12,9 @@ public class IndexController {
     @GetMapping("/")
     public String index(Authentication authentication, Model model) {
         if (authentication != null && authentication.isAuthenticated()) {
-            boolean isAdmin = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
-            boolean isEmpleado = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_EMPLEADO"));
-            boolean isCliente = authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CLIENTE"));
-            
-            model.addAttribute("isAdmin", isAdmin);
-            model.addAttribute("isEmpleado", isEmpleado);
-            model.addAttribute("isCliente", isCliente);
+            model.addAttribute("isAdmin", authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN")));
+            model.addAttribute("isEmpleado", authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_EMPLEADO")));
+            model.addAttribute("isCliente", authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CLIENTE")));
         }
         return "index";
     }

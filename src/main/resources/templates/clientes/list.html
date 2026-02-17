@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,7 +16,7 @@
 
         <div class="d-flex j-c-between a-i-center m-bottom">
             <h1>Listado de Clientes</h1>
-            <a th:href="@{/clientes/nuevo}" class="btn btn-primary">Nuevo Cliente</a>
+            <a sec:authorize="hasAnyRole('ADMIN', 'EMPLEADO')" th:href="@{/clientes/nuevo}" class="btn btn-primary">Nuevo Cliente</a>
         </div>
 
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
@@ -31,11 +32,11 @@
                     <th>ID</th>
                     <th>Nombre</th>
                     <th>Email</th>
-                    <th>Teléfono</th>
+                    <th>Telefono</th>
                     <th>Tipo Cliente</th>
                     <th>Empleado Responsable</th>
                     <th>Fecha Alta</th>
-                    <th>Acciones</th>
+                    <th sec:authorize="hasAnyRole('ADMIN', 'EMPLEADO')">Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -47,12 +48,10 @@
                     <td th:text="${cliente.tipoCliente}"></td>
                     <td th:text="${cliente.idEmpleadoResponsable != null ? cliente.idEmpleadoResponsable.nombre : 'Sin asignar'}"></td>
                     <td th:text="${#temporals.format(cliente.fechaAlta, 'dd/MM/yyyy')}"></td>
-                    <td>
-                        <a th:href="@{/clientes/{id}/editar(id=${cliente.id})}"
-                           class="btn btn-sm btn-warning">Editar</a>
-                        <a th:href="@{/clientes/{id}/eliminar(id=${cliente.id})}"
-                           class="btn btn-sm btn-danger"
-                           onclick="return confirm('¿Está seguro de eliminar este cliente?')">Eliminar</a>
+                    <td sec:authorize="hasAnyRole('ADMIN', 'EMPLEADO')">
+                        <a th:href="@{/clientes/{id}/editar(id=${cliente.id})}" class="btn btn-sm btn-warning">Editar</a>
+                        <a th:href="@{/clientes/{id}/eliminar(id=${cliente.id})}" class="btn btn-sm btn-danger"
+                           onclick="return confirm('¿Esta seguro de eliminar este cliente?')">Eliminar</a>
                     </td>
                 </tr>
             </tbody>
@@ -61,7 +60,7 @@
         <footer class="footer">
             <span class="footer-title">Sistema CRM</span>
             <form th:action="@{/logout}" method="post" class="footer-logout">
-                <button type="submit" class="logout-link">Cerrar Sesión</button>
+                <button type="submit" class="logout-link">Cerrar Sesion</button>
             </form>
         </footer>
     </div>

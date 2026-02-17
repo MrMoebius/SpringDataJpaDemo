@@ -4,102 +4,50 @@ import jakarta.validation.Valid;
 import org.springdataapi.springdemojpa.models.Empleados;
 import org.springdataapi.springdemojpa.models.EmpleadosDTO;
 import org.springdataapi.springdemojpa.service.EmpleadosService;
-import org.springdataapi.springdemojpa.service.RolesEmpleadoService;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-@Controller
-@RequestMapping("/empleados")
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/empleados")
+@PreAuthorize("hasRole('ADMIN')")
 public class EmpleadosController {
 
     private final EmpleadosService empleadosService;
-    private final RolesEmpleadoService rolesEmpleadoService;
 
-    public EmpleadosController(EmpleadosService empleadosService,
-                               RolesEmpleadoService rolesEmpleadoService) {
+    public EmpleadosController(EmpleadosService empleadosService) {
         this.empleadosService = empleadosService;
-        this.rolesEmpleadoService = rolesEmpleadoService;
     }
 
     @GetMapping
-    public String listar(Model model) {
-        model.addAttribute("empleados", empleadosService.findAll());
-        return "empleados/list";
+    public ResponseEntity<List<Empleados>> listar() {
+        return ResponseEntity.ok(empleadosService.findAll());
     }
 
-    @GetMapping("/nuevo")
-    public String nuevo(Model model) {
-        model.addAttribute("empleadosDTO", new EmpleadosDTO());
-        model.addAttribute("roles", rolesEmpleadoService.findAll());
-        return "empleados/form";
+    @GetMapping("/{id}")
+    public ResponseEntity<Empleados> obtenerPorId(@PathVariable Integer id) {
+        return ResponseEntity.ok(empleadosService.findById(id));
     }
 
-    @GetMapping("/{id}/editar")
-    public String editar(@PathVariable Integer id, Model model) {
-        Empleados emp = empleadosService.findById(id);
-
-        EmpleadosDTO dto = new EmpleadosDTO();
-        dto.setId(emp.getId());
-        dto.setNombre(emp.getNombre());
-        dto.setEmail(emp.getEmail());
-        dto.setTelefono(emp.getTelefono());
-        dto.setEstado(emp.getEstado());
-        dto.setFechaIngreso(emp.getFechaIngreso());
-        if (emp.getIdRol() != null) {
-            dto.setIdRol(emp.getIdRol().getId());
-        }
-        // NO rellenamos password para no exponerla
-
-        model.addAttribute("empleadosDTO", dto);
-        model.addAttribute("roles", rolesEmpleadoService.findAll());
-        return "empleados/form";
+    @PostMapping
+    public ResponseEntity<Map<String, String>> crear(@Valid @RequestBody EmpleadosDTO dto) {
+        empleadosService.crear(dto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of("message", "Empleado creado correctamente"));
     }
 
-    @PostMapping("/guardar")
-    public String guardar(
-            @Valid @ModelAttribute("empleadosDTO") EmpleadosDTO dto,
-            BindingResult result,
-            Model model,
-            RedirectAttributes redirectAttributes) {
-        if (result.hasErrors()) {
-            model.addAttribute("roles", rolesEmpleadoService.findAll());
-            return "empleados/form";
-        }
-
-        try {
-            if (dto.getId() == null) {
-                empleadosService.crear(dto);
-                redirectAttributes.addFlashAttribute("success", "Empleado añadido correctamente");
-            } else {
-                empleadosService.actualizar(dto.getId(), dto);
-                redirectAttributes.addFlashAttribute("success", "Empleado modificado correctamente");
-            }
-        } catch (RuntimeException e) {
-            model.addAttribute("error", e.getMessage());
-            model.addAttribute("roles", rolesEmpleadoService.findAll());
-            return "empleados/form";
-        }
-
-        return "redirect:/empleados";
+    @PutMapping("/{id}")
+    public ResponseEntity<Empleados> actualizar(@PathVariable Integer id, @Valid @RequestBody EmpleadosDTO dto) {
+        return ResponseEntity.ok(empleadosService.actualizar(id, dto));
     }
 
-    @GetMapping("/{id}/eliminar")
-    public String eliminar(@PathVariable Integer id, Model model, RedirectAttributes redirectAttributes) {
-        try {
-            empleadosService.eliminar(id);
-            redirectAttributes.addFlashAttribute("success", "Empleado eliminado correctamente");
-        } catch (RuntimeException e) {
-            model.addAttribute("error", e.getMessage());
-            model.addAttribute("empleados", empleadosService.findAll());
-            return "empleados/list";
-        } catch (Exception e) {
-            model.addAttribute("error", "No se puede eliminar el empleado porque tiene registros relacionados (clientes asignados, facturas, etc.)");
-            model.addAttribute("empleados", empleadosService.findAll());
-            return "empleados/list";
-        }
-        return "redirect:/empleados";
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Map<String, String>> eliminar(@PathVariable Integer id) {
+        empleadosService.eliminar(id);
+        return ResponseEntity.ok(Map.of("message", "Empleado eliminado correctamente"));
     }
 }

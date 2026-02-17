@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,7 +32,7 @@
                     <th>ID</th>
                     <th>Nombre</th>
                     <th>Email</th>
-                    <th>Teléfono</th>
+                    <th>Telefono</th>
                     <th>Rol</th>
                     <th>Estado</th>
                     <th>Fecha ingreso</th>
@@ -48,11 +49,9 @@
                     <td th:text="${empleado.estado}"></td>
                     <td th:text="${empleado.fechaIngreso != null ? #temporals.format(empleado.fechaIngreso, 'dd/MM/yyyy') : ''}"></td>
                     <td>
-                        <a th:href="@{/empleados/{id}/editar(id=${empleado.id})}"
-                           class="btn btn-sm btn-warning">Editar</a>
-                        <a th:href="@{/empleados/{id}/eliminar(id=${empleado.id})}"
-                           class="btn btn-sm btn-danger"
-                           onclick="return confirm('¿Está seguro de eliminar este empleado?')">Eliminar</a>
+                        <a th:href="@{/empleados/{id}/editar(id=${empleado.id})}" class="btn btn-sm btn-warning">Editar</a>
+                        <a th:href="@{/empleados/{id}/eliminar(id=${empleado.id})}" class="btn btn-sm btn-danger"
+                           onclick="return confirm('¿Esta seguro de eliminar este empleado?')">Eliminar</a>
                     </td>
                 </tr>
             </tbody>
@@ -61,7 +60,7 @@
         <footer class="footer">
             <span class="footer-title">Sistema CRM</span>
             <form th:action="@{/logout}" method="post" class="footer-logout">
-                <button type="submit" class="logout-link">Cerrar Sesión</button>
+                <button type="submit" class="logout-link">Cerrar Sesion</button>
             </form>
         </footer>
     </div>

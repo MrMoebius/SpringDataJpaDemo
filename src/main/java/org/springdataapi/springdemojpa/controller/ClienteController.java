@@ -1,145 +1,66 @@
 package org.springdataapi.springdemojpa.controller;
 
 import jakarta.validation.Valid;
-import org.springdataapi.springdemojpa.models.ClientesDTO;
 import org.springdataapi.springdemojpa.models.Clientes;
+import org.springdataapi.springdemojpa.models.ClientesDTO;
 import org.springdataapi.springdemojpa.security.CustomUserDetails;
 import org.springdataapi.springdemojpa.service.ClienteService;
-import org.springdataapi.springdemojpa.service.EmpleadosService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
-@Controller
-@RequestMapping("/clientes")
+@RestController
+@RequestMapping("/api/clientes")
 public class ClienteController {
 
     private final ClienteService clienteService;
-    private final EmpleadosService empleadosService;
 
-    public ClienteController(ClienteService clienteService,
-                             EmpleadosService empleadosService) {
+    public ClienteController(ClienteService clienteService) {
         this.clienteService = clienteService;
-        this.empleadosService = empleadosService;
     }
 
     @GetMapping
-    public String listar(Authentication authentication, Model model) {
-        // Si es CLIENTE, redirige a su perfil
-        if (authentication != null && 
-            authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CLIENTE"))) {
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            return "redirect:/clientes/mi-perfil";
-        }
-        model.addAttribute("clientes", clienteService.findAll());
-        return "clientes/list";
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
+    public ResponseEntity<List<Clientes>> listar() {
+        return ResponseEntity.ok(clienteService.findAll());
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
+    public ResponseEntity<Clientes> obtenerPorId(@PathVariable Integer id) {
+        return ResponseEntity.ok(clienteService.findById(id));
     }
 
     @GetMapping("/mi-perfil")
-    public String miPerfil(Authentication authentication, Model model) {
-        if (authentication == null || 
-            !authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CLIENTE"))) {
-            return "redirect:/clientes";
-        }
-        
+    @PreAuthorize("hasRole('CLIENTE')")
+    public ResponseEntity<Clientes> miPerfil(Authentication authentication) {
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        Clientes cliente = clienteService.findById(userDetails.getUserId());
-        model.addAttribute("cliente", cliente);
-        return "clientes/perfil";
+        return ResponseEntity.ok(clienteService.findById(userDetails.getUserId()));
     }
 
-    @GetMapping("/nuevo")
-    public String nuevoCliente(Authentication authentication, Model model) {
-        // Solo ADMIN y EMPLEADO pueden crear clientes
-        if (authentication == null || 
-            authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CLIENTE"))) {
-            return "redirect:/clientes";
-        }
-        model.addAttribute("clienteDTO", new ClientesDTO());
-        model.addAttribute("empleados", empleadosService.findAll());
-        return "clientes/form";
+    @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
+    public ResponseEntity<Map<String, String>> crear(@Valid @RequestBody ClientesDTO dto) {
+        clienteService.crear(dto);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of("message", "Cliente creado correctamente"));
     }
 
-    @GetMapping("/{id}/editar")
-    public String editarCliente(@PathVariable Integer id, Authentication authentication, Model model) {
-        if (authentication != null &&
-            authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CLIENTE"))) {
-            return "redirect:/clientes/mi-perfil";
-        }
-        Clientes cliente = clienteService.findById(id);
-
-        ClientesDTO dto = new ClientesDTO();
-        dto.setId(cliente.getId());
-        dto.setNombre(cliente.getNombre());
-        dto.setEmail(cliente.getEmail());
-        dto.setTelefono(cliente.getTelefono());
-        dto.setTipo_cliente(cliente.getTipoCliente());
-        // NO establecer password para no exponerla
-        dto.setPassword(null);
-        dto.setFecha_alta(cliente.getFechaAlta());
-        if (cliente.getIdEmpleadoResponsable() != null) {
-            dto.setId_empleadoresponsable(cliente.getIdEmpleadoResponsable().getId());
-        }
-
-        model.addAttribute("clienteDTO", dto);
-        model.addAttribute("empleados", empleadosService.findAll());
-        return "clientes/form";
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
+    public ResponseEntity<Clientes> actualizar(@PathVariable Integer id, @Valid @RequestBody ClientesDTO dto) {
+        return ResponseEntity.ok(clienteService.actualizar(id, dto));
     }
 
-    @PostMapping("/guardar")
-    public String guardarCliente(
-            @Valid @ModelAttribute("clienteDTO") ClientesDTO dto,
-            BindingResult result,
-            Model model,
-            RedirectAttributes redirectAttributes) {
-        if (result.hasErrors()) {
-            model.addAttribute("empleados", empleadosService.findAll());
-            return "clientes/form";
-        }
-
-        try {
-            if (dto.getId() == null) {
-                clienteService.crear(dto);
-                redirectAttributes.addFlashAttribute("success", "Cliente añadido correctamente");
-            } else {
-                clienteService.actualizar(dto.getId(), dto);
-                redirectAttributes.addFlashAttribute("success", "Cliente modificado correctamente");
-            }
-        } catch (RuntimeException e) {
-            model.addAttribute("error", e.getMessage());
-            model.addAttribute("empleados", empleadosService.findAll());
-            return "clientes/form";
-        }
-
-        return "redirect:/clientes";
-    }
-
-    @GetMapping("/{id}/eliminar")
-    public String eliminarCliente(@PathVariable Integer id, Authentication authentication, Model model, RedirectAttributes redirectAttributes) {
-        // Solo ADMIN y EMPLEADO pueden eliminar
-        if (authentication == null || 
-            authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_CLIENTE"))) {
-            return "redirect:/clientes";
-        }
-        try {
-            clienteService.eliminar(id);
-            redirectAttributes.addFlashAttribute("success", "Cliente eliminado correctamente");
-        } catch (RuntimeException e) {
-            model.addAttribute("error", e.getMessage());
-            model.addAttribute("clientes", clienteService.findAll());
-            return "clientes/list";
-        } catch (Exception e) {
-            model.addAttribute("error", "No se puede eliminar el cliente porque tiene registros relacionados (facturas, presupuestos, etc.)");
-            model.addAttribute("clientes", clienteService.findAll());
-            return "clientes/list";
-        }
-        return "redirect:/clientes";
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
+    public ResponseEntity<Map<String, String>> eliminar(@PathVariable Integer id) {
+        clienteService.eliminar(id);
+        return ResponseEntity.ok(Map.of("message", "Cliente eliminado correctamente"));
     }
 }

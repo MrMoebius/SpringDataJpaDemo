@@ -46,5 +46,4 @@ public interface ClientesRepository extends JpaRepository<Clientes, Integer>
             @Param("tipoCliente") String tipoCliente,
             @Param("idEmpleado") Integer idEmpleado,
             @Param("fechaDesde") LocalDate fechaDesde);
-
 }

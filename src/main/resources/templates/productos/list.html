@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,8 +15,9 @@
         </div>
 
         <div class="d-flex j-c-between a-i-center m-bottom">
-            <h1 th:text="${soloLectura != null && soloLectura ? 'Productos Disponibles' : 'Listado de Productos'}"></h1>
-            <a th:if="${soloLectura == null || !soloLectura}" th:href="@{/productos/nuevo}" class="btn btn-success">Nuevo Producto</a>
+            <h1 sec:authorize="hasAnyRole('ADMIN', 'EMPLEADO')">Listado de Productos</h1>
+            <h1 sec:authorize="hasRole('CLIENTE')">Productos Disponibles</h1>
+            <a sec:authorize="hasAnyRole('ADMIN', 'EMPLEADO')" th:href="@{/productos/nuevo}" class="btn btn-success">Nuevo Producto</a>
         </div>
 
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
@@ -26,7 +28,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Nombre</th>
-                    <th>Categoría</th>
+                    <th>Categoria</th>
                     <th>Precio</th>
                     <th>Activo</th>
                     <th>Acciones</th>
@@ -38,14 +40,13 @@
                     <td th:text="${p.nombre}"></td>
                     <td th:text="${p.categoria}"></td>
                     <td th:text="${p.precio != null ? #numbers.formatDecimal(p.precio, 1, 2) : 'N/A'}"></td>
-                    <td th:text="${p.activo} ? 'Sí' : 'No'"></td>
-                    <td th:if="${soloLectura == null || !soloLectura}">
+                    <td th:text="${p.activo} ? 'Si' : 'No'"></td>
+                    <td sec:authorize="hasAnyRole('ADMIN', 'EMPLEADO')">
                         <a th:href="@{|/productos/editar/${p.id}|}" class="btn btn-sm btn-warning">Editar</a>
-                        <a th:href="@{|/productos/eliminar/${p.id}|}"
-                           class="btn btn-sm btn-danger"
+                        <a th:href="@{|/productos/eliminar/${p.id}|}" class="btn btn-sm btn-danger"
                            onclick="return confirm('¿Eliminar producto?');">Eliminar</a>
                     </td>
-                    <td th:if="${soloLectura != null && soloLectura}">
+                    <td sec:authorize="hasRole('CLIENTE')">
                         <span style="color: #b0b0b0;">Solo lectura</span>
                     </td>
                 </tr>
@@ -55,7 +56,7 @@
         <footer class="footer">
             <span class="footer-title">Sistema CRM</span>
             <form th:action="@{/logout}" method="post" class="footer-logout">
-                <button type="submit" class="logout-link">Cerrar Sesión</button>
+                <button type="submit" class="logout-link">Cerrar Sesion</button>
             </form>
         </footer>
     </div>

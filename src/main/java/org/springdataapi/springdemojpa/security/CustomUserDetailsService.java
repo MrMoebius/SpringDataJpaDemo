@@ -12,9 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-/**
- * Servicio personalizado de autenticación que busca usuarios en Empleados y Clientes.
- */
+
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 

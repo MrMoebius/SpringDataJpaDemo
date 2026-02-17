@@ -1,87 +1,127 @@
 package org.springdataapi.springdemojpa.config;
 
+import org.springdataapi.springdemojpa.security.JwtAuthenticationEntryPoint;
+import org.springdataapi.springdemojpa.security.JwtAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-/**
- * Configuración de seguridad de Spring Security.
- * Define autenticación, autorización y manejo de login/logout.
- */
+import java.util.Arrays;
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
+    private final JwtAuthenticationEntryPoint authenticationEntryPoint;
+    private final JwtAuthenticationFilter authenticationFilter;
 
-    public SecurityConfig(UserDetailsService userDetailsService) {
+    @Value("${app.cors.allowed-origins}")
+    private String allowedOrigins;
+
+    public SecurityConfig(UserDetailsService userDetailsService,
+                          JwtAuthenticationEntryPoint authenticationEntryPoint,
+                          JwtAuthenticationFilter authenticationFilter) {
         this.userDetailsService = userDetailsService;
+        this.authenticationEntryPoint = authenticationEntryPoint;
+        this.authenticationFilter = authenticationFilter;
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        // PasswordEncoder personalizado que no encripta (las contraseñas en BD están en texto plano)
-        return new PasswordEncoder() {
-            @Override
-            public String encode(CharSequence rawPassword) {
-                return rawPassword.toString();
-            }
-
-            @Override
-            public boolean matches(CharSequence rawPassword, String encodedPassword) {
-                return rawPassword.toString().equals(encodedPassword);
-            }
-        };
+    @SuppressWarnings("deprecation")
+    public static PasswordEncoder passwordEncoder() {
+        // TODO: Cambiar a BCryptPasswordEncoder cuando las contraseñas en BD esten encriptadas
+        return NoOpPasswordEncoder.getInstance();
     }
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
     }
 
-    /**
-     * Configura la cadena de filtros de seguridad.
-     */
+    // ==================== FILTER CHAIN 1: API REST (JWT Stateless) ====================
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+    @Order(1)
+    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
+        http.securityMatcher("/api/**")
+                .csrf(csrf -> csrf.disable())
+                .cors(Customizer.withDefaults())
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/empleados/**").hasRole("ADMIN")
+                        .requestMatchers("/api/clientes/**").hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE")
+                        .requestMatchers("/api/productos/**").hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE")
+                        .requestMatchers("/api/consultas/**").hasAnyRole("ADMIN", "EMPLEADO")
+                        .anyRequest().authenticated()
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                );
+
+        http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        return http.build();
+    }
+
+    // ==================== FILTER CHAIN 2: Web Thymeleaf (Form Login + Session) ====================
+    @Bean
+    @Order(2)
+    public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
         http
-            // Autorizaciones de rutas según roles
-            .authorizeHttpRequests(auth -> auth
-                // Rutas públicas (sin autenticación)
-                .requestMatchers("/css/**", "/login", "/error").permitAll()
-                // Solo ADMIN puede acceder a empleados
-                .requestMatchers("/empleados/**").hasRole("ADMIN")
-                // ADMIN y EMPLEADO pueden hacer CRUD completo de clientes y productos
-                .requestMatchers("/clientes/**").hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE")
-                .requestMatchers("/productos/**").hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE")
-                .requestMatchers("/consultas/**").hasAnyRole("ADMIN", "EMPLEADO")
-                // Resto de rutas requieren autenticación
-                .anyRequest().authenticated()
-            )
-            
-            // Configuración de login
-            .formLogin(form -> form
-                .loginPage("/login")  // Página personalizada de login
-                .defaultSuccessUrl("/", true)  // Redirige a "/" después del login
-                .permitAll()
-            )
-            
-            // Configuración de logout
-            .logout(logout -> logout
-                .logoutUrl("/logout")  // URL para cerrar sesión (POST)
-                .logoutSuccessUrl("/login?logout")  // Redirige al login después del logout
-                .permitAll()
-            )
-            
-            .authenticationProvider(authenticationProvider());
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/css/**", "/login", "/error").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/empleados/**").hasRole("ADMIN")
+                        .requestMatchers("/clientes/**").hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE")
+                        .requestMatchers("/productos/**").hasAnyRole("ADMIN", "EMPLEADO", "CLIENTE")
+                        .requestMatchers("/consultas/**").hasAnyRole("ADMIN", "EMPLEADO")
+                        .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/", true)
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
+                        .permitAll()
+                );
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+
+        return source;
     }
 }
