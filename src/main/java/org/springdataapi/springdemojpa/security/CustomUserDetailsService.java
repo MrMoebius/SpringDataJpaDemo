@@ -14,6 +14,9 @@ import java.util.Optional;
 
 
 @Service
+// [SPRING SECURITY] Implementa UserDetailsService, la interfaz de Spring Security
+// que conecta la autenticacion con nuestra base de datos.
+// Spring Security llama a loadUserByUsername() para verificar las credenciales del usuario
 public class CustomUserDetailsService implements UserDetailsService {
 
     private final EmpleadosRepository empleadosRepository;
@@ -25,6 +28,8 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.clientesRepository = clientesRepository;
     }
 
+    // [SPRING SECURITY] Metodo obligatorio de UserDetailsService
+    // Busca al usuario por email en BD y devuelve un UserDetails con sus roles
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -69,6 +74,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             );
         }
 
+        // [SPRING SECURITY] Excepcion de Spring Security cuando el usuario no existe
         throw new UsernameNotFoundException("Usuario no encontrado: " + username);
     }
 }

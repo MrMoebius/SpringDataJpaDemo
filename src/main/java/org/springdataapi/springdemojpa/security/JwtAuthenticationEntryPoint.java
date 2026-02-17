@@ -15,10 +15,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
+// [SPRING SECURITY] Implementa AuthenticationEntryPoint de Spring Security
+// Se ejecuta cuando una peticion no tiene token JWT valido y devuelve un error 401 en JSON
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    // [SPRING SECURITY] Metodo que Spring Security llama cuando falla la autenticacion
     @Override
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,

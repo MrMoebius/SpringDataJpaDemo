@@ -25,7 +25,7 @@ public class ClienteController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')") // [SPRING SECURITY] Solo ADMIN y EMPLEADO pueden listar clientes
     public ResponseEntity<List<Clientes>> listar() {
         return ResponseEntity.ok(clienteService.findAll());
     }
@@ -37,8 +37,9 @@ public class ClienteController {
     }
 
     @GetMapping("/mi-perfil")
-    @PreAuthorize("hasRole('CLIENTE')")
+    @PreAuthorize("hasRole('CLIENTE')") // [SPRING SECURITY] Solo CLIENTE puede ver su propio perfil
     public ResponseEntity<Clientes> miPerfil(Authentication authentication) {
+        // [SPRING SECURITY] Obtiene los datos del usuario autenticado desde el contexto de seguridad
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         return ResponseEntity.ok(clienteService.findById(userDetails.getUserId()));
     }

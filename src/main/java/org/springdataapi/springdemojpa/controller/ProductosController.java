@@ -23,7 +23,7 @@ public class ProductosController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO', 'CLIENTE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO', 'CLIENTE')") // [SPRING SECURITY] Todos los roles pueden leer productos
     public ResponseEntity<List<Productos>> listar() {
         return ResponseEntity.ok(productosService.findAll());
     }
@@ -47,7 +47,7 @@ public class ProductosController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')") // [SPRING SECURITY] Solo ADMIN y EMPLEADO pueden crear productos
     public ResponseEntity<Map<String, String>> crear(@Valid @RequestBody ProductosDTO dto) {
         productosService.crear(dto);
         return ResponseEntity.status(HttpStatus.CREATED)

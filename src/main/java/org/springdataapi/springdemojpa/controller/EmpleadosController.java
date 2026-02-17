@@ -14,7 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/empleados")
-@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMIN')") // [SPRING SECURITY] Solo ADMIN puede acceder a todos los endpoints de este controller
 public class EmpleadosController {
 
     private final EmpleadosService empleadosService;

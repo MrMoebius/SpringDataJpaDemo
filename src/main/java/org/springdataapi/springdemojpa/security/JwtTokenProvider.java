@@ -11,6 +11,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
+// [SPRING SECURITY] Clase que genera, valida y extrae datos de los tokens JWT
+// Se usa junto con JwtAuthenticationFilter para la autenticacion stateless de la API REST
 public class JwtTokenProvider {
 
     @Value("${app.jwt-secret}")
@@ -23,6 +25,7 @@ public class JwtTokenProvider {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
+    // [SPRING SECURITY] Genera un token JWT a partir del objeto Authentication de Spring Security
     public String generateToken(Authentication authentication) {
         String username = authentication.getName();
         Date now = new Date();
@@ -36,6 +39,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    // [SPRING SECURITY] Extrae el nombre de usuario (email) del token JWT
     public String getUsername(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey())
@@ -45,6 +49,7 @@ public class JwtTokenProvider {
                 .getSubject();
     }
 
+    // [SPRING SECURITY] Valida que el token JWT sea correcto y no haya expirado
     public boolean validateToken(String token) {
         try {
             Jwts.parser()

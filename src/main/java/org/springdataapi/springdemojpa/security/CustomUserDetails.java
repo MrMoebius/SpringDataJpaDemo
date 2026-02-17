@@ -8,7 +8,9 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * Implementación personalizada de UserDetails que incluye información del tipo de usuario.
+ * [SPRING SECURITY] Implementacion personalizada de UserDetails.
+ * UserDetails es la interfaz de Spring Security que representa al usuario autenticado.
+ * Aqui definimos los datos del usuario (email, password, rol) y sus permisos (authorities).
  */
 public class CustomUserDetails implements UserDetails {
 
@@ -26,6 +28,8 @@ public class CustomUserDetails implements UserDetails {
         this.userType = userType;
     }
 
+    // [SPRING SECURITY] Devuelve los permisos/roles del usuario (ej: ROLE_ADMIN)
+    // Spring Security usa esto para evaluar @PreAuthorize y hasRole()
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
@@ -41,6 +45,8 @@ public class CustomUserDetails implements UserDetails {
         return username;
     }
 
+    // [SPRING SECURITY] Metodos obligatorios de UserDetails
+    // Devuelven true para indicar que la cuenta esta activa y no bloqueada
     @Override
     public boolean isAccountNonExpired() {
         return true;

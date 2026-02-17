@@ -23,6 +23,7 @@ import java.util.Map;
 @RequestMapping("/api/auth")
 public class AuthController {
 
+    // [SPRING SECURITY] AuthenticationManager valida las credenciales (email/password)
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final LoginRateLimiter loginRateLimiter;
@@ -54,15 +55,18 @@ public class AuthController {
         }
 
         try {
+            // [SPRING SECURITY] Autentica al usuario con email y password usando AuthenticationManager
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword()));
 
+            // [SPRING SECURITY] Guarda la autenticacion en el contexto de seguridad
             SecurityContextHolder.getContext().setAuthentication(authentication);
             loginRateLimiter.registerSuccessfulLogin(key);
             loginRateLimiter.registerSuccessfulLogin(ip);
 
             String token = jwtTokenProvider.generateToken(authentication);
 
+            // [SPRING SECURITY] Obtiene el rol del usuario desde las authorities de Spring Security
             String role = authentication.getAuthorities().stream()
                     .findFirst()
                     .map(item -> item.getAuthority())
@@ -89,6 +93,7 @@ public class AuthController {
                     );
 
             return ResponseEntity.ok(response);
+        // [SPRING SECURITY] BadCredentialsException: excepcion de Spring Security cuando el password es incorrecto
         } catch (BadCredentialsException e) {
             loginRateLimiter.registerFailedAttempt(key);
             loginRateLimiter.registerFailedAttempt(ip);

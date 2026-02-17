@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/consultas")
-@PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')")
+@PreAuthorize("hasAnyRole('ADMIN', 'EMPLEADO')") // [SPRING SECURITY] Solo ADMIN y EMPLEADO pueden acceder
 public class ConsultasController {
 
     private final ClienteService clienteService;
